@@ -15,7 +15,7 @@ public class GetPlayerCamera : MonoBehaviour
 
         if (thisObject.HasInputAuthority)
         {
-            GameObject virtualCamera = GameObject.Find("Camera");
+            GameObject virtualCamera = GameObject.Find("PlayerFollowCamera");
             virtualCamera.GetComponent<CinemachineVirtualCamera>().Follow = playerCamera;
 
             GetComponent<MovePerson>().enabled = true;

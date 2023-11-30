@@ -11,22 +11,31 @@ namespace GooglyEyesGames.FusionBites
 
     public class FusionConnector : MonoBehaviour, INetworkRunnerCallbacks
     {
-
+        public static FusionConnector instance;
         public bool coonectOnAwake = false;
-        [HideInInspector] public NetworkRunner runner;
+        public NetworkRunner runner;
 
         [SerializeField] NetworkObject playerPrefabs;
 
+        public string _playerName = null;
+
         private void Awake()
         {
+            if(instance == null)
+            {
+                instance = this;
+            }
             if(coonectOnAwake == true)
             {
-                OnConnectedToRunner();
+                OnConnectedToRunner("Anonimus");
             }
         }
 
-        public async void OnConnectedToRunner()
+        public async void OnConnectedToRunner(string playerName)
         {
+            _playerName = playerName;
+
+
             if (runner == null)
             {
                 runner = gameObject.AddComponent<NetworkRunner>();
