@@ -26,6 +26,7 @@ public class MovePerson : MonoBehaviour
 	private Rigidbody body;
 	private float rotationY;
 
+
 	void Start()
 	{
 		body = GetComponent<Rigidbody>();
