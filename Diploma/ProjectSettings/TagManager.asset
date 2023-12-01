@@ -4,7 +4,8 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Ground
+  - Right Hand
+  - Left Hand
   layers:
   - Default
   - TransparentFX
@@ -21,8 +22,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - Player
+  - Interactable
   - 
   - 
   - 
