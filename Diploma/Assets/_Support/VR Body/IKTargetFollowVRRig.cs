@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Unity.Netcode;
 
 [System.Serializable]
 public class VRMap
@@ -14,10 +15,11 @@ public class VRMap
     }
 }
 
-public class IKTargetFollowVRRig : MonoBehaviour
+public class IKTargetFollowVRRig : NetworkBehaviour
 {
     [Range(0,1)]
     public float turnSmoothness = 0.1f;
+    public Transform root;
     public VRMap head;
     public VRMap leftHand;
     public VRMap rightHand;
@@ -25,15 +27,23 @@ public class IKTargetFollowVRRig : MonoBehaviour
     public Vector3 headBodyPositionOffset;
     public float headBodyYawOffset;
 
-    // Update is called once per frame
     void LateUpdate()
     {
-        transform.position = head.ikTarget.position + headBodyPositionOffset;
-        float yaw = head.vrTarget.eulerAngles.y;
-        transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.Euler(transform.eulerAngles.x, yaw, transform.eulerAngles.z),turnSmoothness);
+        if (IsOwner)
+        {
+            //root.position = VRRigReference.Singleton.root.position;
+            //root.rotation = VRRigReference.Singleton.root.rotation;
+            head.vrTarget = VRRigReference.Singleton.head;
+            leftHand.vrTarget = VRRigReference.Singleton.leftHand;
+            rightHand.vrTarget = VRRigReference.Singleton.rightHand;
 
-        head.Map();
-        leftHand.Map();
-        rightHand.Map();
+            transform.position = head.ikTarget.position + headBodyPositionOffset;
+            float yaw = head.vrTarget.eulerAngles.y;
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(transform.eulerAngles.x, yaw, transform.eulerAngles.z), turnSmoothness);
+
+            head.Map();
+            leftHand.Map();
+            rightHand.Map();
+        }
     }
 }
