@@ -4,7 +4,7 @@ using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using System;
-
+using UnityEngine.UI;
 
 namespace GooglyEyesGames.FusionBites 
 {
@@ -19,22 +19,40 @@ namespace GooglyEyesGames.FusionBites
 
         public string _playerName = null;
 
+        [Header("Session List")]
+        public GameObject roomListCanvas;
+        private List<SessionInfo> _sessions = new List<SessionInfo>();
+        public Button refrechButton;
+        public Transform sessionListCounter;
+        public GameObject sessionEntyPrefabs;
+
         private void Awake()
         {
             if(instance == null)
             {
                 instance = this;
             }
-            if(coonectOnAwake == true)
-            {
-                OnConnectedToRunner("Anonimus");
-            }
         }
 
-        public async void OnConnectedToRunner(string playerName)
+        public void ConnectToLobby(string playerName)
         {
+            roomListCanvas.SetActive(true);
+
             _playerName = playerName;
 
+            if(runner == null)
+            {
+                runner = gameObject.AddComponent<NetworkRunner>();
+            }
+
+            runner.JoinSessionLobby(SessionLobby.Shared);
+
+
+        }
+
+        public async void OnConnectedToSession(string sessionName)
+        {
+            roomListCanvas.SetActive(false);
 
             if (runner == null)
             {
@@ -44,10 +62,27 @@ namespace GooglyEyesGames.FusionBites
             await runner.StartGame(new StartGameArgs()
             { 
                 GameMode = GameMode.Shared,
-                SessionName = "test",
-                PlayerCount = 2,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
-            
+                SessionName = sessionName,
+            });
+        }
+
+        public async void CreateSession()
+        {
+            roomListCanvas.SetActive(false);
+
+            int randomInt = UnityEngine.Random.Range(1000, 9999);
+            string randomSessionName = "Room-" + randomInt.ToString();
+
+            if (runner == null)
+            {
+                runner = gameObject.AddComponent<NetworkRunner>();
+            }
+
+            await runner.StartGame(new StartGameArgs()
+            {
+                GameMode = GameMode.Shared,
+                SessionName = randomSessionName,
+                PlayerCount = 10,
             });
         }
 
@@ -59,6 +94,42 @@ namespace GooglyEyesGames.FusionBites
             runner.SetPlayerObject(runner.LocalPlayer, playerObject);
         
         
+        }
+
+
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
+            _sessions.Clear();
+            _sessions = sessionList;
+
+        }
+
+        public void RefreshSessionListUI()
+        {
+            foreach(Transform child in sessionListCounter)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach(SessionInfo session in _sessions)
+            {
+                if (session.IsVisible)
+                {
+                    GameObject enty = GameObject.Instantiate(sessionEntyPrefabs, sessionListCounter);
+                    SessionEntryPrefabs scripts = enty.GetComponent<SessionEntryPrefabs>();
+                    scripts.sessionName.text = session.Name;
+                    scripts.playerCount.text = session.PlayerCount + "/" + session.MaxPlayers;
+                
+                    if(session.IsOpen == false || session.PlayerCount >= session.MaxPlayers)
+                    {
+                        scripts.joinButton.interactable = false;
+                    }
+                    else
+                    {
+                        scripts.joinButton.interactable = true;
+                    }
+                }
+            }
         }
 
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
@@ -117,11 +188,6 @@ namespace GooglyEyesGames.FusionBites
         }
 
         public void OnSceneLoadStart(NetworkRunner runner)
-        {
-            
-        }
-
-        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
         {
             
         }

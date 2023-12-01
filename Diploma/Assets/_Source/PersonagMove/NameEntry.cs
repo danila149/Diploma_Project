@@ -13,7 +13,7 @@ public class NameEntry : MonoBehaviour
 
     public void SubmitName()
     {
-        FusionConnector.instance.OnConnectedToRunner(nameInputFild.text);
+        FusionConnector.instance.ConnectToLobby(nameInputFild.text);
         canvas.SetActive(false);
     }
 
