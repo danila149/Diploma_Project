@@ -10,13 +10,14 @@ public class MovePerson : NetworkBehaviour
 	public float speed = 1.5f;
 
 	public Transform head;
+	public Transform headPos;
 
-	public float sensitivity = 5f; // чувствительность мыши
-	public float headMinY = -40f; // ограничение угла для головы
+	public float sensitivity = 5f;
+	public float headMinY = -40f;
 	public float headMaxY = 40f;
 
-	public KeyCode jumpButton = KeyCode.Space; // клавиша для прыжка
-	public float jumpForce = 10; // сила прыжка
+	public KeyCode jumpButton = KeyCode.Space;
+	public float jumpForce = 10;
 
 	private bool isGrounded;
 
@@ -84,7 +85,7 @@ public class MovePerson : NetworkBehaviour
 				head = Camera.main.gameObject.transform;
 			}
 
-			head.position = transform.position;
+			head.position = headPos.position;
 			h = Input.GetAxis("Horizontal");
 			v = Input.GetAxis("Vertical");
 
