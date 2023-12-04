@@ -9,15 +9,11 @@ using UnityEngine;
 
 public class LobbyManager : MonoBehaviour {
 
-
     public static LobbyManager Instance { get; private set; }
-
 
     public const string KEY_PLAYER_NAME = "PlayerName";
     public const string KEY_PLAYER_CHARACTER = "Character";
-    public const string KEY_GAME_MODE = "GameMode";
-
-
+    public const string RELAY_CODE_CHARACTER = "RelayCode";
 
     public event EventHandler OnLeftLobby;
 
@@ -33,20 +29,6 @@ public class LobbyManager : MonoBehaviour {
     public class OnLobbyListChangedEventArgs : EventArgs {
         public List<Lobby> lobbyList;
     }
-
-
-    public enum GameMode {
-        CaptureTheFlag,
-        Conquest
-    }
-
-    public enum PlayerCharacter {
-        Marine,
-        Ninja,
-        Zombie
-    }
-
-
 
     private float heartbeatTimer;
     private float lobbyPollTimer;
@@ -152,38 +134,21 @@ public class LobbyManager : MonoBehaviour {
 
     private Player GetPlayer() {
         return new Player(AuthenticationService.Instance.PlayerId, null, new Dictionary<string, PlayerDataObject> {
-            { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName) },
-            { KEY_PLAYER_CHARACTER, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, PlayerCharacter.Marine.ToString()) }
+            { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName) }
         });
     }
 
-    public void ChangeGameMode() {
-        if (IsLobbyHost()) {
-            GameMode gameMode =
-                Enum.Parse<GameMode>(joinedLobby.Data[KEY_GAME_MODE].Value);
-
-            switch (gameMode) {
-                default:
-                case GameMode.CaptureTheFlag:
-                    gameMode = GameMode.Conquest;
-                    break;
-                case GameMode.Conquest:
-                    gameMode = GameMode.CaptureTheFlag;
-                    break;
-            }
-
-            UpdateLobbyGameMode(gameMode);
-        }
-    }
-
-    public async void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate, GameMode gameMode) {
+    public async void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate) {
         Player player = GetPlayer();
+
+        string relayCode = await TestRelay.Instance.CreateRelay();
 
         CreateLobbyOptions options = new CreateLobbyOptions {
             Player = player,
             IsPrivate = isPrivate,
-            Data = new Dictionary<string, DataObject> {
-                { KEY_GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode.ToString()) }
+            Data = new Dictionary<string, DataObject>
+            {
+                {RELAY_CODE_CHARACTER, new DataObject(DataObject.VisibilityOptions.Member, relayCode) }
             }
         };
 
@@ -192,8 +157,6 @@ public class LobbyManager : MonoBehaviour {
         joinedLobby = lobby;
 
         OnJoinedLobby?.Invoke(this, new LobbyEventArgs { lobby = lobby });
-
-        Debug.Log("Created Lobby " + lobby.Name);
     }
 
     public async void RefreshLobbyList() {
@@ -233,6 +196,8 @@ public class LobbyManager : MonoBehaviour {
 
         joinedLobby = lobby;
 
+        TestRelay.Instance.JoinRelay(joinedLobby.Data[RELAY_CODE_CHARACTER].Value);
+
         OnJoinedLobby?.Invoke(this, new LobbyEventArgs { lobby = lobby });
     }
 
@@ -242,6 +207,8 @@ public class LobbyManager : MonoBehaviour {
         joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobby.Id, new JoinLobbyByIdOptions {
             Player = player
         });
+
+        TestRelay.Instance.JoinRelay(joinedLobby.Data[RELAY_CODE_CHARACTER].Value);
 
         OnJoinedLobby?.Invoke(this, new LobbyEventArgs { lobby = lobby });
     }
@@ -273,37 +240,14 @@ public class LobbyManager : MonoBehaviour {
         }
     }
 
-    public async void UpdatePlayerCharacter(PlayerCharacter playerCharacter) {
-        if (joinedLobby != null) {
-            try {
-                UpdatePlayerOptions options = new UpdatePlayerOptions();
-
-                options.Data = new Dictionary<string, PlayerDataObject>() {
-                    {
-                        KEY_PLAYER_CHARACTER, new PlayerDataObject(
-                            visibility: PlayerDataObject.VisibilityOptions.Public,
-                            value: playerCharacter.ToString())
-                    }
-                };
-
-                string playerId = AuthenticationService.Instance.PlayerId;
-
-                Lobby lobby = await LobbyService.Instance.UpdatePlayerAsync(joinedLobby.Id, playerId, options);
-                joinedLobby = lobby;
-
-                OnJoinedLobbyUpdate?.Invoke(this, new LobbyEventArgs { lobby = joinedLobby });
-            } catch (LobbyServiceException e) {
-                Debug.Log(e);
-            }
-        }
-    }
-
     public async void QuickJoinLobby() {
         try {
             QuickJoinLobbyOptions options = new QuickJoinLobbyOptions();
 
             Lobby lobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
             joinedLobby = lobby;
+
+            TestRelay.Instance.JoinRelay(joinedLobby.Data[RELAY_CODE_CHARACTER].Value);
 
             OnJoinedLobby?.Invoke(this, new LobbyEventArgs { lobby = lobby });
         } catch (LobbyServiceException e) {
@@ -334,23 +278,4 @@ public class LobbyManager : MonoBehaviour {
             }
         }
     }
-
-    public async void UpdateLobbyGameMode(GameMode gameMode) {
-        try {
-            Debug.Log("UpdateLobbyGameMode " + gameMode);
-            
-            Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions {
-                Data = new Dictionary<string, DataObject> {
-                    { KEY_GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode.ToString()) }
-                }
-            });
-
-            joinedLobby = lobby;
-
-            OnLobbyGameModeChanged?.Invoke(this, new LobbyEventArgs { lobby = joinedLobby });
-        } catch (LobbyServiceException e) {
-            Debug.Log(e);
-        }
-    }
-
 }

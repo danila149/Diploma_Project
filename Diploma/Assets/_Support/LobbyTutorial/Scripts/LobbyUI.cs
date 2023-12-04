@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
@@ -8,20 +6,13 @@ using UnityEngine.UI;
 
 public class LobbyUI : MonoBehaviour {
 
-
     public static LobbyUI Instance { get; private set; }
-
 
     [SerializeField] private Transform playerSingleTemplate;
     [SerializeField] private Transform container;
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI playerCountText;
-    [SerializeField] private TextMeshProUGUI gameModeText;
-    [SerializeField] private Button changeMarineButton;
-    [SerializeField] private Button changeNinjaButton;
-    [SerializeField] private Button changeZombieButton;
     [SerializeField] private Button leaveLobbyButton;
-    [SerializeField] private Button changeGameModeButton;
 
 
     private void Awake() {
@@ -29,27 +20,13 @@ public class LobbyUI : MonoBehaviour {
 
         playerSingleTemplate.gameObject.SetActive(false);
 
-        changeMarineButton.onClick.AddListener(() => {
-            LobbyManager.Instance.UpdatePlayerCharacter(LobbyManager.PlayerCharacter.Marine);
-        });
-        changeNinjaButton.onClick.AddListener(() => {
-            LobbyManager.Instance.UpdatePlayerCharacter(LobbyManager.PlayerCharacter.Ninja);
-        });
-        changeZombieButton.onClick.AddListener(() => {
-            LobbyManager.Instance.UpdatePlayerCharacter(LobbyManager.PlayerCharacter.Zombie);
-        });
-
         leaveLobbyButton.onClick.AddListener(() => {
             LobbyManager.Instance.LeaveLobby();
-        });
-
-        changeGameModeButton.onClick.AddListener(() => {
-            LobbyManager.Instance.ChangeGameMode();
         });
     }
 
     private void Start() {
-        LobbyManager.Instance.OnJoinedLobby += UpdateLobby_Event;
+        //LobbyManager.Instance.OnJoinedLobby += UpdateLobby_Event;
         LobbyManager.Instance.OnJoinedLobbyUpdate += UpdateLobby_Event;
         LobbyManager.Instance.OnLobbyGameModeChanged += UpdateLobby_Event;
         LobbyManager.Instance.OnLeftLobby += LobbyManager_OnLeftLobby;
@@ -87,11 +64,8 @@ public class LobbyUI : MonoBehaviour {
             lobbyPlayerSingleUI.UpdatePlayer(player);
         }
 
-        changeGameModeButton.gameObject.SetActive(LobbyManager.Instance.IsLobbyHost());
-
         lobbyNameText.text = lobby.Name;
         playerCountText.text = lobby.Players.Count + "/" + lobby.MaxPlayers;
-        gameModeText.text = lobby.Data[LobbyManager.KEY_GAME_MODE].Value;
 
         Show();
     }
@@ -110,5 +84,4 @@ public class LobbyUI : MonoBehaviour {
     private void Show() {
         gameObject.SetActive(true);
     }
-
 }
