@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class ScaleFromMicrophone : MonoBehaviour
+public class ScaleFromMicrophone : NetworkBehaviour
 {
 
     public Vector3 minScale;
