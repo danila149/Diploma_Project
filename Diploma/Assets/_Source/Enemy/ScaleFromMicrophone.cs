@@ -6,8 +6,6 @@ using Unity.Netcode;
 public class ScaleFromMicrophone : NetworkBehaviour
 {
 
-    public Vector3 minScale;
-    public Vector3 maxScale;
     public AudioLounge detection;
 
 
@@ -15,7 +13,7 @@ public class ScaleFromMicrophone : NetworkBehaviour
     public float threshold = 0.1f;
     public float max = 5;
 
-    public Transform player;
+    public GameObject Player;
 
     private bool chek;
 
@@ -28,19 +26,23 @@ public class ScaleFromMicrophone : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        float loudness = detection.GetLoudnessFromMicrophone() * loundsSensebility;
-        if (loudness >= max)
+        if (IsServer)
         {
-            chek = true;
-        }
-        if (chek)
-        {
-            transform.position = Vector3.Lerp(transform.position, player.position, 5 * Time.deltaTime);
+            Player = GameObject.FindGameObjectWithTag("Player");
+            float loudness = detection.GetLoudnessFromMicrophone() * loundsSensebility;
+            if (loudness >= max)
+            {
+                chek = true;
+            }
+            if (chek)
+            {
+                transform.position = Vector3.Lerp(transform.position, Player.transform.position, 5 * Time.deltaTime);
+            }
+
+            if (loudness < threshold)
+                loudness = 0;
         }
 
-        if (loudness < threshold)
-            loudness = 0;
 
-        //transform.localScale = Vector3.Lerp(minScale, maxScale, loudness);
     }
 }

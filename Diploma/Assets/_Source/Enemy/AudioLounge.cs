@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class AudioLounge : MonoBehaviour
 {
-    public int sampleWindow = 64;
+    public int sampleWindow = 128;
     private AudioClip microphoneClip;
-    // Start is called before the first frame update
     void Start()
     {
         MicrophoneToAudioClip();
     }
 
-    // Update is called once per frame
     void Update()
     {
         
@@ -20,14 +18,13 @@ public class AudioLounge : MonoBehaviour
 
     public void MicrophoneToAudioClip()
     {
-        string microphoneName = Microphone.devices[0];
-        microphoneClip = Microphone.Start(microphoneName, true, 20, AudioSettings.outputSampleRate);
+        microphoneClip = Microphone.Start(null, true, 10, AudioSettings.outputSampleRate);
     }
 
 
     public float GetLoudnessFromMicrophone()
     {
-        return GetLoundnessFromAudioClip(Microphone.GetPosition(Microphone.devices[0]), microphoneClip);
+        return GetLoundnessFromAudioClip(Microphone.GetPosition(null), microphoneClip);
     }
 
     public float GetLoundnessFromAudioClip(int clipPosition, AudioClip clip)

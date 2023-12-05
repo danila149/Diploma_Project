@@ -5,6 +5,7 @@ using Unity.Netcode;
 public class VoiceManeger : NetworkBehaviour
 {
     private AudioSource audioSource;
+    [SerializeField] private NetworkManager networkManager;
 
     void Start()
     {
@@ -13,5 +14,10 @@ public class VoiceManeger : NetworkBehaviour
         audioSource.loop = true;
         while (!(Microphone.GetPosition(null) > 0)) { }
         audioSource.Play();
+    }
+
+    private void Update()
+    {
+        
     }
 }
