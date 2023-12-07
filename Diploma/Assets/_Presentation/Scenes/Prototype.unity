@@ -529,6 +529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trackedPoseDriver: {fileID: 82323538}
+  originXR: {fileID: 1198668276}
 --- !u!1 &86769272
 GameObject:
   m_ObjectHideFlags: 0

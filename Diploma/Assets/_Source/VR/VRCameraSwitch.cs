@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem.XR;
 
 public class VRCameraSwitch : MonoBehaviour
 {
     [SerializeField] private TrackedPoseDriver trackedPoseDriver;
+    [SerializeField] private GameObject originXR;
 
     void Start()
     {
@@ -16,6 +15,8 @@ public class VRCameraSwitch : MonoBehaviour
         else
         {
             trackedPoseDriver.enabled = false;
+            transform.parent = originXR.transform.parent;
+            originXR.SetActive(false);
         }
     }
 }

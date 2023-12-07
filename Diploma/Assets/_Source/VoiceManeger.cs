@@ -5,7 +5,6 @@ using Unity.Netcode;
 public class VoiceManeger : NetworkBehaviour
 {
     private AudioSource audioSource;
-    [SerializeField] private NetworkManager networkManager;
 
     void Start()
     {
