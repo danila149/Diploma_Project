@@ -18,7 +18,7 @@ public class Flashlight : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
         {
             if(IsLocal)
-                GetComponent<PhotonView>().RPC("Use", RpcTarget.All);
+                GetComponent<PhotonView>().RPC("Use", RpcTarget.AllBuffered);
         }
     }
 

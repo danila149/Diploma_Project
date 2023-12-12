@@ -35,11 +35,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
-
-        Debug.Log("Connected and in a room");
-
         roomCam.SetActive(false);
-
         RespawnPlayer();
     }
 
@@ -49,6 +45,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         _player.GetComponent<PhotonView>().RPC("SetNickname", RpcTarget.AllBuffered, nickname);
         _player.GetComponent<PlayerSetup>().IsLocalPlayer();
         _player.GetComponent<Flashlight>().IsLocal = true;
+        _player.GetComponent<PickUpSystem>().IsLocal = true;
     }
 
     public void ChangeNickname(string newNickname)
@@ -58,8 +55,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void JoinRoomButtonPressed()
     {
-        Debug.Log("Connecting...");
-
         joinBtn.onClick.RemoveListener(JoinRoomButtonPressed);
         inputNickname.onValueChanged.RemoveListener(ChangeNickname);
         nicknameScreen.SetActive(false);

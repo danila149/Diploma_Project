@@ -8,8 +8,6 @@ public class PlayerSetup : MonoBehaviour
     [SerializeField] private GameObject camera;
     [SerializeField] private TextMeshPro nicknameText;
 
-    private string nickname;
-
     public void IsLocalPlayer()
     {
         movement.enabled = true;
@@ -20,8 +18,6 @@ public class PlayerSetup : MonoBehaviour
     [PunRPC]
     public void SetNickname(string newNickname)
     {
-        nickname = newNickname;
-
-        nicknameText.text = nickname;
+        nicknameText.text = newNickname;
     }
 }
