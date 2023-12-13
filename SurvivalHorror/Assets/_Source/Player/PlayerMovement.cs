@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+	public bool PlayerInput { get; set; }
+
 	public float speed = 1.5f;
 
 	public Transform head;
@@ -31,23 +33,27 @@ public class PlayerMovement : MonoBehaviour
 		body.freezeRotation = true;
 		layerMask = 1 << gameObject.layer | 1 << 2;
 		layerMask = ~layerMask;
+		PlayerInput = true;
 		//Cursor.lockState = CursorLockMode.Locked;
 		//Cursor.visible = false;
 	}
 
 	void FixedUpdate()
 	{
-		body.AddForce(direction * speed, ForceMode.VelocityChange);
+        if (PlayerInput)
+        {
+			body.AddForce(direction * speed, ForceMode.VelocityChange);
 
-		if (Mathf.Abs(body.velocity.x) > speed)
-		{
-			body.velocity = new Vector3(Mathf.Sign(body.velocity.x) * speed, body.velocity.y, body.velocity.z);
+			if (Mathf.Abs(body.velocity.x) > speed)
+			{
+				body.velocity = new Vector3(Mathf.Sign(body.velocity.x) * speed, body.velocity.y, body.velocity.z);
+			}
+			if (Mathf.Abs(body.velocity.z) > speed)
+			{
+				body.velocity = new Vector3(body.velocity.x, body.velocity.y, Mathf.Sign(body.velocity.z) * speed);
+			}
 		}
-		if (Mathf.Abs(body.velocity.z) > speed)
-		{
-			body.velocity = new Vector3(body.velocity.x, body.velocity.y, Mathf.Sign(body.velocity.z) * speed);
-		}
-
+		
 		isGrounded = false;
 	}
 
@@ -61,22 +67,25 @@ public class PlayerMovement : MonoBehaviour
 
 	void Update()
 	{
-		h = Input.GetAxis("Horizontal");
-		v = Input.GetAxis("Vertical");
+        if (PlayerInput)
+        {
+			h = Input.GetAxis("Horizontal");
+			v = Input.GetAxis("Vertical");
 
-		float rotationX = head.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivity;
-		rotationY += Input.GetAxis("Mouse Y") * sensitivity;
-		rotationY = Mathf.Clamp(rotationY, headMinY, headMaxY);
-		head.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
+			float rotationX = head.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivity;
+			rotationY += Input.GetAxis("Mouse Y") * sensitivity;
+			rotationY = Mathf.Clamp(rotationY, headMinY, headMaxY);
+			head.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
 
-		direction = new Vector3(h, 0, v);
-		direction = head.TransformDirection(direction);
-		direction = new Vector3(direction.x, 0, direction.z);
-		
+			direction = new Vector3(h, 0, v);
+			direction = head.TransformDirection(direction);
+			direction = new Vector3(direction.x, 0, direction.z);
 
-		if (Input.GetKeyDown(jumpButton) && isGrounded == true)
-		{
-			body.velocity = new Vector2(0, jumpForce);
+
+			if (Input.GetKeyDown(jumpButton) && isGrounded == true)
+			{
+				body.velocity = new Vector2(0, jumpForce);
+			}
 		}
 	}
 }

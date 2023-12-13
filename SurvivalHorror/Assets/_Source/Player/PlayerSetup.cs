@@ -6,12 +6,14 @@ public class PlayerSetup : MonoBehaviour
 {
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private GameObject camera;
+    [SerializeField] private GameObject hud;
     [SerializeField] private TextMeshPro nicknameText;
 
     public void IsLocalPlayer()
     {
         movement.enabled = true;
         camera.SetActive(true);
+        hud.SetActive(true);
         nicknameText.gameObject.SetActive(false);
     }
 

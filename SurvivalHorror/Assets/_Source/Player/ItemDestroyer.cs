@@ -13,6 +13,9 @@ public class ItemDestroyer : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.layer == _itemLayer)
+        {
             other.gameObject.SetActive(false);
+            gameObject.SetActive(false);
+        }
     }
 }

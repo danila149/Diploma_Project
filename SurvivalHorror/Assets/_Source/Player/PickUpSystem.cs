@@ -7,6 +7,7 @@ public class PickUpSystem : MonoBehaviour
     [SerializeField] private LayerMask itemLayerMask;
     [SerializeField] private float distanceToPickUp;
     [SerializeField] private GameObject itemDestroyer;
+    [SerializeField] private Inventory inventory;
 
     public bool IsLocal { get; set; }
 
@@ -31,9 +32,7 @@ public class PickUpSystem : MonoBehaviour
             if (Physics.Raycast(head.position, head.forward, out hit, distanceToPickUp, ~_itemLayer))
             {
                 _item = hit.transform.gameObject.GetComponent<Item>();
-                _item.ShowText(true);
-                if (Input.GetKeyDown(KeyCode.E))
-                    GetComponent<PhotonView>().RPC("PickUp", RpcTarget.AllBuffered, _item.transform.position);
+                PickUp(_item);
             }
             else
             {
@@ -43,9 +42,20 @@ public class PickUpSystem : MonoBehaviour
         }
     }
 
-    [PunRPC]
-    public void PickUp(Vector3 itemPos)
+    public void PickUp(Item currentItem)
     {
+        currentItem.ShowText(true);
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if(inventory.AddItem(currentItem))
+                GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, currentItem.transform.position);
+        }
+    }
+
+    [PunRPC]
+    private void DisableItem(Vector3 itemPos)
+    {
+        itemDestroyer.SetActive(true);
         itemDestroyer.transform.position = itemPos;
     }
 }
