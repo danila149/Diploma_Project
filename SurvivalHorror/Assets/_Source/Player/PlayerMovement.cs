@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+	public static PlayerMovement Instance { get; private set; }
+
 	public bool PlayerInput { get; set; }
 
 	public float speed = 1.5f;
@@ -26,17 +28,22 @@ public class PlayerMovement : MonoBehaviour
 	private Rigidbody body;
 	private float rotationY;
 
+    private void Awake()
+    {
+		Instance = this;
+	}
 
-	void Start()
+
+    void Start()
 	{
 		body = GetComponent<Rigidbody>();
 		body.freezeRotation = true;
 		layerMask = 1 << gameObject.layer | 1 << 2;
 		layerMask = ~layerMask;
 		PlayerInput = true;
-		//Cursor.lockState = CursorLockMode.Locked;
-		//Cursor.visible = false;
-	}
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
 
 	void FixedUpdate()
 	{
@@ -69,6 +76,8 @@ public class PlayerMovement : MonoBehaviour
 	{
         if (PlayerInput)
         {
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
 			h = Input.GetAxis("Horizontal");
 			v = Input.GetAxis("Vertical");
 
@@ -86,6 +95,11 @@ public class PlayerMovement : MonoBehaviour
 			{
 				body.velocity = new Vector2(0, jumpForce);
 			}
+        }
+        else
+        {
+			Cursor.lockState = CursorLockMode.None;
+			Cursor.visible = true;
 		}
 	}
 }

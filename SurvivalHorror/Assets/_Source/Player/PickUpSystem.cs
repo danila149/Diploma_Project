@@ -11,13 +11,7 @@ public class PickUpSystem : MonoBehaviour
 
     public bool IsLocal { get; set; }
 
-    private int _itemLayer;
     private Item _item = null;
-
-    void Start()
-    {
-        _itemLayer = 1 << itemLayerMask | 1 << 2;
-    }
 
     private void Awake()
     {
@@ -29,7 +23,7 @@ public class PickUpSystem : MonoBehaviour
         if (IsLocal)
         {
             RaycastHit hit;
-            if (Physics.Raycast(head.position, head.forward, out hit, distanceToPickUp, ~_itemLayer))
+            if (Physics.Raycast(head.position, head.forward, out hit, distanceToPickUp, itemLayerMask))
             {
                 _item = hit.transform.gameObject.GetComponent<Item>();
                 PickUp(_item);

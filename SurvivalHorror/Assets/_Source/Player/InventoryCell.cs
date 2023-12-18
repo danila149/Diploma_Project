@@ -48,7 +48,8 @@ public class InventoryCell : MonoBehaviour, IDragHandler, IBeginDragHandler, IEn
                 {
                     if (gameObject != item)
                     {
-                        Inventory.SwitchItemCell(this, item.GetComponent<InventoryCell>());
+                        if(!Inventory.AddItemToStack(this, item.GetComponent<InventoryCell>()))
+                            Inventory.SwitchItemCell(this, item.GetComponent<InventoryCell>());
                         return;
                     }
                 }

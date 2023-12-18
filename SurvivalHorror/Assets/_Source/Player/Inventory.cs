@@ -10,7 +10,6 @@ public class Inventory : MonoBehaviour
     [SerializeField] private GameObject inventoryUI;
     [SerializeField] private GameObject hudUI;
     [SerializeField] private Transform dropPos;
-    [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private Hotbar hotbar;
 
     private Dictionary<InventoryCell, Item> inventoryData;
@@ -29,11 +28,11 @@ public class Inventory : MonoBehaviour
                 inventoryUI.SetActive(false);
                 hudUI.SetActive(true);
                 HotbarUpdateUI();
-                playerMovement.PlayerInput = true;
+                PlayerMovement.Instance.PlayerInput = true;
             }
             else
             {
-                playerMovement.PlayerInput = false;
+                PlayerMovement.Instance.PlayerInput = false;
                 hudUI.SetActive(false);
                 inventoryUI.SetActive(true);
             }
@@ -74,15 +73,9 @@ public class Inventory : MonoBehaviour
                 if(inventoryData[cell]?.Amount + newItem.Amount > MAX_STACK)
                 {
                     Item currenItem = inventoryData[cell];
-
                     newItem.Amount = newItem.Amount-(MAX_STACK - currenItem.Amount);
-
                     currenItem.Amount += MAX_STACK - currenItem.Amount;
-                    inventoryData[cell] = currenItem;
-                    cell.SetItemCount(currenItem.Amount.ToString());
-                    cell.SetSprite(currenItem.Data.ItemIcon);
-
-                    cell.IsEmpty = false;
+                    SetItemToCell(cell, currenItem);
                     HotbarUpdateUI();
                     if (!AddItem(newItem))
                         GetComponent<PhotonView>().RPC("DropItem", RpcTarget.AllBuffered, newItem.Data.Type.ToString(), newItem.Amount);
@@ -93,20 +86,39 @@ public class Inventory : MonoBehaviour
                 {
                     Item currenItem = inventoryData[cell];
                     currenItem.Amount += newItem.Amount;
-                    inventoryData[cell] = currenItem;
-                    cell.SetItemCount(currenItem.Amount.ToString());
-                    cell.SetSprite(currenItem.Data.ItemIcon);
-                    cell.IsEmpty = false;
+                    SetItemToCell(cell, currenItem);
                     HotbarUpdateUI();
                     return true;
                 }
             } else if (cell.IsEmpty)
             {
-                inventoryData[cell] = newItem;
-                cell.SetItemCount(newItem.Amount.ToString());
-                cell.SetSprite(newItem.Data.ItemIcon);
-                cell.IsEmpty = false;
+                SetItemToCell(cell, newItem);
                 HotbarUpdateUI();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool AddItemToStack(InventoryCell origin, InventoryCell newCell)
+    {
+        if(inventoryData[origin].Data.Type == inventoryData[newCell]?.Data.Type)
+        {
+            if (inventoryData[newCell]?.Amount == MAX_STACK)
+                return false;
+
+            if(inventoryData[origin].Amount + inventoryData[newCell].Amount > MAX_STACK)
+            {
+                inventoryData[origin].Amount -= MAX_STACK - inventoryData[newCell].Amount;
+                origin.SetItemCount(inventoryData[origin].Amount.ToString());
+                inventoryData[newCell].Amount = MAX_STACK;
+                newCell.SetItemCount(MAX_STACK.ToString());
+                return true;
+            }else if(inventoryData[origin].Amount + inventoryData[newCell].Amount <= MAX_STACK)
+            {
+                inventoryData[newCell].Amount += inventoryData[origin].Amount;
+                newCell.SetItemCount(inventoryData[newCell].Amount.ToString());
+                SetItemToCell(origin, null);
                 return true;
             }
         }
@@ -118,30 +130,111 @@ public class Inventory : MonoBehaviour
         if (newCell.IsEmpty)
         {
             Item item = inventoryData[origin];
-            inventoryData[newCell] = item;
-            newCell.SetItemCount(item.Amount.ToString());
-            newCell.SetSprite(item.Data.ItemIcon);
-            newCell.IsEmpty = false;
-
-            inventoryData[origin] = null;
-            origin.SetItemCount("");
-            origin.SetSprite(null);
-            origin.IsEmpty = true;
+            SetItemToCell(newCell, item);
+            SetItemToCell(origin, null);
         }
     }
 
     public void RemoveItem(InventoryCell cell)
     {
         Item item = inventoryData[cell];
-        cell.IsEmpty = true;
-        cell.SetItemCount("");
-        cell.SetSprite(null);
-        inventoryData[cell] = null;
+        SetItemToCell(cell, null);
         DropItem(item.Data.Type.ToString(), item.Amount);
     }
     private void DropItem(string itemName, int itemAmount)
     {
         Item droppedItem = PhotonNetwork.Instantiate(itemName, dropPos.position, Quaternion.identity).GetComponent<Item>();
         droppedItem.Amount = itemAmount;
+    }
+
+    public bool SearchItemBy(ItemType itemType, int amount)
+    {
+        int _counter = 0;
+        foreach (Item item in inventoryData.Values)
+        {
+            if (item != null)
+            {
+                if(item.Data.Type == itemType)
+                {
+                    if (item.Amount >= amount)
+                        return true;
+
+                    _counter += item.Amount;
+                    if (_counter >= amount)
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+    public void UseItemBy(ItemType itemType, int amount)
+    {
+        if(SearchItemBy(itemType, amount))
+        {
+            int _counter = 0;
+            List<InventoryCell> cellsInUse = new List<InventoryCell>();
+            foreach (InventoryCell cell in inventoryData.Keys)
+            {
+                if (inventoryData[cell] != null)
+                {
+                    if (inventoryData[cell].Data.Type == itemType)
+                    {
+                        if (inventoryData[cell].Amount >= amount)
+                        {
+                            inventoryData[cell].Amount -= amount;
+                            if(inventoryData[cell].Amount == 0)
+                            {
+                                SetItemToCell(cell, null);
+                                return;
+                            }
+
+                            cell.SetItemCount(inventoryData[cell].Amount.ToString());
+                            return;
+                        }
+
+                        _counter += inventoryData[cell].Amount;
+                        cellsInUse.Add(cell);
+                        if (_counter >= amount)
+                        {
+                            int _currentAmountNeed = amount;
+                            foreach (InventoryCell cellInUse in cellsInUse)
+                            {
+                                if(inventoryData[cellInUse].Amount < _currentAmountNeed)
+                                {
+                                    _currentAmountNeed -= inventoryData[cellInUse].Amount;
+                                    SetItemToCell(cellInUse, null);
+                                } else if(inventoryData[cellInUse].Amount >= _currentAmountNeed)
+                                {
+                                    inventoryData[cellInUse].Amount -= _currentAmountNeed;
+                                    if(inventoryData[cellInUse].Amount == 0)
+                                    {
+                                        SetItemToCell(cellInUse, null);
+                                        return;
+                                    }
+                                    cellInUse.SetItemCount(inventoryData[cellInUse].Amount.ToString());
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void SetItemToCell(InventoryCell cell, Item item)
+    {
+        if(item == null)
+        {
+            inventoryData[cell] = null;
+            cell.SetItemCount("");
+            cell.SetSprite(null);
+            cell.IsEmpty = true;
+            return;
+        }
+        inventoryData[cell] = item;
+        cell.SetItemCount(item.Amount.ToString());
+        cell.SetSprite(item.Data.ItemIcon);
+        cell.IsEmpty = false;
     }
 }
