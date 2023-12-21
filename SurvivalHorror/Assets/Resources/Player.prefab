@@ -3423,6 +3423,7 @@ Transform:
   m_Children:
   - {fileID: 7808368446167613862}
   - {fileID: 6594822756933231142}
+  - {fileID: 3713410750601645243}
   m_Father: {fileID: 7808368445505876747}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3644,6 +3645,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &5401656995920692717
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3713410750601645243}
+  m_Layer: 0
+  m_Name: Hand
+  m_TagString: Untagged
+  m_Icon: {fileID: 7148428337604731935, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3713410750601645243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5401656995920692717}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.003, y: -0.75, z: 0.999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 481607156735853574}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5804320557868865694
 GameObject:
   m_ObjectHideFlags: 0
@@ -5154,7 +5186,8 @@ GameObject:
   - component: {fileID: 7304495686271376123}
   - component: {fileID: 8606232681635075570}
   - component: {fileID: 5767511142992588346}
-  m_Layer: 0
+  - component: {fileID: 2235431975747079510}
+  m_Layer: 10
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5405,6 +5438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   head: {fileID: 481607156735853574}
+  hand: {fileID: 3713410750601645243}
   itemLayerMask:
     serializedVersion: 2
     m_Bits: 64
@@ -5454,6 +5488,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildableObject: {fileID: 7766138090872662660, guid: bb47f007171245d4985e334ee09fab6d, type: 3}
+--- !u!114 &2235431975747079510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7808368445505876743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db362e0efc77ebf4f925e6a4f821b62e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  head: {fileID: 481607156735853574}
+  hand: {fileID: 3713410750601645243}
+  workbenchLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  inventory: {fileID: 7304495686271376123}
+  distanceToUse: 0
+  infoPanel: {fileID: 0}
+  craftListItemPrefab: {fileID: 0}
+  craftListParent: {fileID: 0}
+  craftables:
+  - {fileID: 0}
 --- !u!1 &7808368446167613859
 GameObject:
   m_ObjectHideFlags: 0

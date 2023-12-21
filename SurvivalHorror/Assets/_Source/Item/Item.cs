@@ -4,16 +4,19 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     [SerializeField] private TextMeshPro text;
-    [SerializeField] private ItemData data;
-    [SerializeField] private int amount;
+    [SerializeField] private Sprite itemIcon;
 
-    public ItemData Data { get => data; set => data = value; }
-    public int Amount { get => amount; set => amount = value; }
+    public TextMeshPro Text => text;
+    public Sprite ItemIcon => itemIcon;
 
+    public Items.Resource ToResource() =>
+        (Items.Resource)this;
 
-    public void ShowText(bool onOff)
+    public Equipment ToEquipment() =>
+        (Equipment)this;
+
+    public virtual void ShowText(bool onOff)
     {
-        text.text = $"Нажмите Е чтобы подобрать {amount} {data.Type}";
         if (onOff)
             text.gameObject.SetActive(true);
         else

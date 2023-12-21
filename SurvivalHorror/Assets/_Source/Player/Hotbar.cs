@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,12 +55,14 @@ public class Hotbar : MonoBehaviour
             }
             else
             {
-                cell.SetItemCount(items[count].Amount.ToString());
-                cell.SetSprite(items[count].Data.ItemIcon);
+                cell.SetSprite(items[count].ItemIcon);
+                if(items[count].GetType() == typeof(Items.Resource))
+                    cell.SetItemCount(items[count].ToResource().Amount.ToString());
             }
             count++;
         }
         hotbarData = newHotbarData;
+        ShowEquipment();
     }
 
     public void ChooseCell()
@@ -101,6 +104,20 @@ public class Hotbar : MonoBehaviour
         }
     }
 
+    private void ShowEquipment()
+    {
+        if (hotbarData[_currentActiveCell]?.GetType() == typeof(Equipment))
+        {
+            foreach (Item item in hotbarData.Values)
+            {
+                if (item == null)
+                    break;
+                item.gameObject.SetActive(false);
+            }
+            hotbarData[_currentActiveCell].gameObject.SetActive(true);
+        }
+    }
+
     private void ActivateCell(int cellIndex)
     {
         foreach (HotbarCellData hotbarCell in hotbarCells)
@@ -108,5 +125,6 @@ public class Hotbar : MonoBehaviour
 
         hotbarCells[cellIndex].CellOutline.enabled = true;
         _currentActiveCell = hotbarCells[cellIndex].InventoryCell;
+        ShowEquipment();
     }
 }

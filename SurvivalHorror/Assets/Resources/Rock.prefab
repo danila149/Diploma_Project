@@ -231,8 +231,8 @@ GameObject:
   - component: {fileID: 4450219776087460878}
   - component: {fileID: 4450219776087460879}
   - component: {fileID: 4450219776087460882}
-  - component: {fileID: 4450219776087460883}
   - component: {fileID: 320717659532858092}
+  - component: {fileID: 5948470987182469053}
   m_Layer: 6
   m_Name: Rock
   m_TagString: PickupableItem
@@ -335,21 +335,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 126
   m_CollisionDetection: 0
---- !u!114 &4450219776087460883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4450219776087460876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38769546c34c2b246b172eb43d63a9f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 4450219774565951134}
-  data: {fileID: 11400000, guid: eaa370d58556e7f4f8348002d06649e3, type: 2}
-  amount: 1
 --- !u!114 &320717659532858092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,3 +357,19 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &5948470987182469053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4450219776087460876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 431d6db5e7c86214ca4c559a2ecbf6ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 4450219774565951134}
+  itemIcon: {fileID: 21300000, guid: d6bb17a46c7eb3240b7accaf0c30fb67, type: 3}
+  resourceType: 1
+  amount: 1

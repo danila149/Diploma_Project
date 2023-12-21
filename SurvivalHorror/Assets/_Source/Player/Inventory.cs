@@ -1,6 +1,8 @@
 ﻿using Photon.Pun;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Items;
 
 public class Inventory : MonoBehaviour
 {
@@ -68,29 +70,34 @@ public class Inventory : MonoBehaviour
     {
         foreach (InventoryCell cell in inventoryData.Keys)
         {
-            if (inventoryData[cell]?.Data.Type == newItem.Data.Type && inventoryData[cell]?.Amount < MAX_STACK)
+            if(newItem.GetType() == typeof(Items.Resource))
             {
-                if(inventoryData[cell]?.Amount + newItem.Amount > MAX_STACK)
+                Items.Resource currentNewItem = newItem.ToResource();
+                if (inventoryData[cell]?.ToResource().ResourceType == currentNewItem.ResourceType && inventoryData[cell]?.ToResource().Amount < MAX_STACK)
                 {
-                    Item currenItem = inventoryData[cell];
-                    newItem.Amount = newItem.Amount-(MAX_STACK - currenItem.Amount);
-                    currenItem.Amount += MAX_STACK - currenItem.Amount;
-                    SetItemToCell(cell, currenItem);
-                    HotbarUpdateUI();
-                    if (!AddItem(newItem))
-                        GetComponent<PhotonView>().RPC("DropItem", RpcTarget.AllBuffered, newItem.Data.Type.ToString(), newItem.Amount);
+                    if (inventoryData[cell].ToResource()?.Amount + currentNewItem.Amount > MAX_STACK)
+                    {
+                        Items.Resource currenItem = inventoryData[cell].ToResource();
+                        currentNewItem.Amount = currentNewItem.Amount - (MAX_STACK - currenItem.Amount);
+                        currenItem.Amount += MAX_STACK - currenItem.Amount;
+                        SetItemToCell(cell, currenItem);
+                        HotbarUpdateUI();
+                        if (!AddItem(newItem))
+                            DropItem(currentNewItem);
 
-                    return true;
+                        return true;
+                    }
+                    else
+                    {
+                        Items.Resource currenItem = inventoryData[cell].ToResource();
+                        currenItem.Amount += currentNewItem.Amount;
+                        SetItemToCell(cell, currenItem);
+                        HotbarUpdateUI();
+                        return true;
+                    }
                 }
-                else
-                {
-                    Item currenItem = inventoryData[cell];
-                    currenItem.Amount += newItem.Amount;
-                    SetItemToCell(cell, currenItem);
-                    HotbarUpdateUI();
-                    return true;
-                }
-            } else if (cell.IsEmpty)
+            } 
+            if (cell.IsEmpty)
             {
                 SetItemToCell(cell, newItem);
                 HotbarUpdateUI();
@@ -102,24 +109,31 @@ public class Inventory : MonoBehaviour
 
     public bool AddItemToStack(InventoryCell origin, InventoryCell newCell)
     {
-        if(inventoryData[origin].Data.Type == inventoryData[newCell]?.Data.Type)
-        {
-            if (inventoryData[newCell]?.Amount == MAX_STACK)
-                return false;
+        if (newCell.IsEmpty)
+            return false;
 
-            if(inventoryData[origin].Amount + inventoryData[newCell].Amount > MAX_STACK)
+        if(inventoryData[origin].GetType()==typeof(Items.Resource) && inventoryData[newCell].GetType() == typeof(Items.Resource))
+        {
+            if (inventoryData[origin].ToResource().ResourceType == inventoryData[newCell]?.ToResource().ResourceType)
             {
-                inventoryData[origin].Amount -= MAX_STACK - inventoryData[newCell].Amount;
-                origin.SetItemCount(inventoryData[origin].Amount.ToString());
-                inventoryData[newCell].Amount = MAX_STACK;
-                newCell.SetItemCount(MAX_STACK.ToString());
-                return true;
-            }else if(inventoryData[origin].Amount + inventoryData[newCell].Amount <= MAX_STACK)
-            {
-                inventoryData[newCell].Amount += inventoryData[origin].Amount;
-                newCell.SetItemCount(inventoryData[newCell].Amount.ToString());
-                SetItemToCell(origin, null);
-                return true;
+                if (inventoryData[newCell]?.ToResource().Amount == MAX_STACK)
+                    return false;
+
+                if (inventoryData[origin].ToResource().Amount + inventoryData[newCell].ToResource().Amount > MAX_STACK)
+                {
+                    inventoryData[origin].ToResource().Amount -= MAX_STACK - inventoryData[newCell].ToResource().Amount;
+                    origin.SetItemCount(inventoryData[origin].ToResource().Amount.ToString());
+                    inventoryData[newCell].ToResource().Amount = MAX_STACK;
+                    newCell.SetItemCount(MAX_STACK.ToString());
+                    return true;
+                }
+                else if (inventoryData[origin].ToResource().Amount + inventoryData[newCell].ToResource().Amount <= MAX_STACK)
+                {
+                    inventoryData[newCell].ToResource().Amount += inventoryData[origin].ToResource().Amount;
+                    newCell.SetItemCount(inventoryData[newCell].ToResource().Amount.ToString());
+                    SetItemToCell(origin, null);
+                    return true;
+                }
             }
         }
         return false;
@@ -139,27 +153,34 @@ public class Inventory : MonoBehaviour
     {
         Item item = inventoryData[cell];
         SetItemToCell(cell, null);
-        DropItem(item.Data.Type.ToString(), item.Amount);
+        if(item.GetType() == typeof(Resource))
+            DropItem(item.ToResource());
+        else if(item.GetType() == typeof(Equipment))
+            DropItem(item.ToEquipment());
     }
-    private void DropItem(string itemName, int itemAmount)
+    private void DropItem(Items.Resource resource)
     {
-        Item droppedItem = PhotonNetwork.Instantiate(itemName, dropPos.position, Quaternion.identity).GetComponent<Item>();
-        droppedItem.Amount = itemAmount;
+        Items.Resource droppedItem = PhotonNetwork.Instantiate(resource.ResourceType.ToString(), dropPos.position, Quaternion.identity).GetComponent<Items.Resource>();
+        droppedItem.Amount = resource.Amount;
     }
 
-    public bool SearchItemBy(ItemType itemType, int amount)
+    private void DropItem(Equipment equipment)=>
+        PhotonNetwork.Instantiate(equipment.EquipmentType.ToString(), dropPos.position, Quaternion.identity);
+
+    public bool SearchItemBy(ResourceType resourceType, int amount)
     {
         int _counter = 0;
         foreach (Item item in inventoryData.Values)
         {
-            if (item != null)
+            if (item != null && item.GetType()==typeof(Items.Resource))
             {
-                if(item.Data.Type == itemType)
+                Items.Resource currentItem = item.ToResource();
+                if(currentItem.ResourceType == resourceType)
                 {
-                    if (item.Amount >= amount)
+                    if (currentItem.Amount >= amount)
                         return true;
 
-                    _counter += item.Amount;
+                    _counter += currentItem.Amount;
                     if (_counter >= amount)
                         return true;
                 }
@@ -167,51 +188,51 @@ public class Inventory : MonoBehaviour
         }
         return false;
     }
-    public void UseItemBy(ItemType itemType, int amount)
+    public void UseItemBy(ResourceType resourceType, int amount)
     {
-        if(SearchItemBy(itemType, amount))
+        if(SearchItemBy(resourceType, amount))
         {
             int _counter = 0;
             List<InventoryCell> cellsInUse = new List<InventoryCell>();
             foreach (InventoryCell cell in inventoryData.Keys)
             {
-                if (inventoryData[cell] != null)
+                if (inventoryData[cell] != null && inventoryData[cell].GetType()==typeof(Items.Resource))
                 {
-                    if (inventoryData[cell].Data.Type == itemType)
+                    if (inventoryData[cell].ToResource().ResourceType == resourceType)
                     {
-                        if (inventoryData[cell].Amount >= amount)
+                        if (inventoryData[cell].ToResource().Amount >= amount)
                         {
-                            inventoryData[cell].Amount -= amount;
-                            if(inventoryData[cell].Amount == 0)
+                            inventoryData[cell].ToResource().Amount -= amount;
+                            if(inventoryData[cell].ToResource().Amount == 0)
                             {
                                 SetItemToCell(cell, null);
                                 return;
                             }
 
-                            cell.SetItemCount(inventoryData[cell].Amount.ToString());
+                            cell.SetItemCount(inventoryData[cell].ToResource().Amount.ToString());
                             return;
                         }
 
-                        _counter += inventoryData[cell].Amount;
+                        _counter += inventoryData[cell].ToResource().Amount;
                         cellsInUse.Add(cell);
                         if (_counter >= amount)
                         {
                             int _currentAmountNeed = amount;
                             foreach (InventoryCell cellInUse in cellsInUse)
                             {
-                                if(inventoryData[cellInUse].Amount < _currentAmountNeed)
+                                if(inventoryData[cellInUse].ToResource().Amount < _currentAmountNeed)
                                 {
-                                    _currentAmountNeed -= inventoryData[cellInUse].Amount;
+                                    _currentAmountNeed -= inventoryData[cellInUse].ToResource().Amount;
                                     SetItemToCell(cellInUse, null);
-                                } else if(inventoryData[cellInUse].Amount >= _currentAmountNeed)
+                                } else if(inventoryData[cellInUse].ToResource().Amount >= _currentAmountNeed)
                                 {
-                                    inventoryData[cellInUse].Amount -= _currentAmountNeed;
-                                    if(inventoryData[cellInUse].Amount == 0)
+                                    inventoryData[cellInUse].ToResource().Amount -= _currentAmountNeed;
+                                    if(inventoryData[cellInUse].ToResource().Amount == 0)
                                     {
                                         SetItemToCell(cellInUse, null);
                                         return;
                                     }
-                                    cellInUse.SetItemCount(inventoryData[cellInUse].Amount.ToString());
+                                    cellInUse.SetItemCount(inventoryData[cellInUse].ToResource().Amount.ToString());
                                     return;
                                 }
                             }
@@ -231,10 +252,19 @@ public class Inventory : MonoBehaviour
             cell.SetSprite(null);
             cell.IsEmpty = true;
             return;
+        } else if (item.GetType() == typeof(Items.Resource))
+        {
+            inventoryData[cell] = item;
+            Items.Resource currentItem = item.ToResource();
+            cell.SetItemCount(currentItem.Amount.ToString());
+            cell.SetSprite(currentItem.ItemIcon);
+            cell.IsEmpty = false;
+        } else if (item.GetType() == typeof(Equipment))
+        {
+            inventoryData[cell] = item;
+            cell.SetSprite(item.ItemIcon);
+            cell.IsEmpty = false;
         }
-        inventoryData[cell] = item;
-        cell.SetItemCount(item.Amount.ToString());
-        cell.SetSprite(item.Data.ItemIcon);
-        cell.IsEmpty = false;
+        
     }
 }

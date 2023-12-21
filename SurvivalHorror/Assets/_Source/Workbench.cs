@@ -7,7 +7,7 @@ public class Workbench : MonoBehaviour
 
     public void ShowText(bool onOff)
     {
-        text.text = $"Нажмите Е чтобы рикрыть верстак";
+        text.text = $"Нажмите Е чтобы открыть верстак";
         if (onOff)
             text.gameObject.SetActive(true);
         else

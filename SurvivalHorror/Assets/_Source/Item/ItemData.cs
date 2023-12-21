@@ -4,9 +4,13 @@ using UnityEngine;
 public class ItemData : ScriptableObject
 {
     [SerializeField] private ItemType type;
+    [SerializeField] private ResourceType resourceType;
+    [SerializeField] private EquipmentType equipmentType;
     [SerializeField] private Sprite itemIcon;
 
 
     public ItemType Type => type;
+    public ResourceType ResourceType => resourceType;
+    public EquipmentType EquipmentType => equipmentType;
     public Sprite ItemIcon => itemIcon;
 }

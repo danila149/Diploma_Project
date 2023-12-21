@@ -4,6 +4,7 @@ using UnityEngine;
 public class PickUpSystem : MonoBehaviour
 {
     [SerializeField] private Transform head;
+    [SerializeField] private Transform hand;
     [SerializeField] private LayerMask itemLayerMask;
     [SerializeField] private float distanceToPickUp;
     [SerializeField] private GameObject itemDestroyer;
@@ -41,8 +42,16 @@ public class PickUpSystem : MonoBehaviour
         currentItem.ShowText(true);
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if(inventory.AddItem(currentItem))
+            if (inventory.AddItem(currentItem))
+            {
                 GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, currentItem.transform.position);
+
+                if (currentItem.GetType() == typeof(Equipment))
+                {
+                    GetComponent<PhotonView>().RPC("TakeEquipment", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
+                }
+
+            }
         }
     }
 
@@ -51,5 +60,11 @@ public class PickUpSystem : MonoBehaviour
     {
         itemDestroyer.SetActive(true);
         itemDestroyer.transform.position = itemPos;
+    }
+
+    [PunRPC]
+    private void TakeEquipment(Vector3 itemPos, Vector3 playerPos)
+    {
+        itemDestroyer.GetComponent<ItemDestroyer>().TakeItem(playerPos);
     }
 }

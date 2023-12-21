@@ -18,11 +18,6 @@ public class CratingSystem : MonoBehaviour
 
     private Workbench _workbench = null;
 
-    void Start()
-    {
-        
-    }
-
     void Update()
     {
         if (IsLocal)

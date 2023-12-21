@@ -1,5 +1,5 @@
 public enum ItemType
 {
-    Log,
-    Rock
+    Resource,
+    Equipment
 }
