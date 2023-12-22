@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class Hotbar : MonoBehaviour
 {
     [SerializeField] private Transform gridParent;
+    [SerializeField] private Transform hand;
 
     private Dictionary<InventoryCell, Item> hotbarData;
     private List<HotbarCellData> hotbarCells;
@@ -106,14 +107,16 @@ public class Hotbar : MonoBehaviour
 
     private void ShowEquipment()
     {
+        if(hand.childCount > 0)
+        {
+            for (int i = 0; i < hand.childCount; i++)
+            {
+                hand.GetChild(i).gameObject.SetActive(false);
+            }
+        }
+
         if (hotbarData[_currentActiveCell]?.GetType() == typeof(Equipment))
         {
-            foreach (Item item in hotbarData.Values)
-            {
-                if (item == null)
-                    break;
-                item.gameObject.SetActive(false);
-            }
             hotbarData[_currentActiveCell].gameObject.SetActive(true);
         }
     }

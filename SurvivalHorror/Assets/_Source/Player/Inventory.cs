@@ -13,7 +13,9 @@ public class Inventory : MonoBehaviour
     [SerializeField] private GameObject hudUI;
     [SerializeField] private Transform dropPos;
     [SerializeField] private Hotbar hotbar;
+    [SerializeField] private CraftingSystem craftingSystem;
 
+    public bool IsCrafting { get; set; }
     private Dictionary<InventoryCell, Item> inventoryData;
 
     void Start()
@@ -23,10 +25,11 @@ public class Inventory : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (Input.GetKeyDown(KeyCode.Tab) && !IsCrafting)
         {
             if (inventoryUI.activeInHierarchy)
             {
+                craftingSystem.IsInventoryOpen = false;
                 inventoryUI.SetActive(false);
                 hudUI.SetActive(true);
                 HotbarUpdateUI();
@@ -34,6 +37,7 @@ public class Inventory : MonoBehaviour
             }
             else
             {
+                craftingSystem.IsInventoryOpen = true;
                 PlayerMovement.Instance.PlayerInput = false;
                 hudUI.SetActive(false);
                 inventoryUI.SetActive(true);
@@ -240,6 +244,7 @@ public class Inventory : MonoBehaviour
                     }
                 }
             }
+            Debug.Log("error");
         }
     }
 

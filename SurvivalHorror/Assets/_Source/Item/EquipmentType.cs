@@ -1,4 +1,5 @@
 public enum EquipmentType
 {
-    WoodenSword
+    WoodenSword,
+    StoneSword
 }

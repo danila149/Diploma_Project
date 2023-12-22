@@ -15,6 +15,6 @@ public class CraftData : ScriptableObject
 [Serializable]
 public class Resource
 {
-    public ItemType itemType;
+    public ResourceType resourceType;
     public int amount;
 }

@@ -46,7 +46,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         _player.GetComponent<PlayerSetup>().IsLocalPlayer();
         _player.GetComponent<Flashlight>().IsLocal = true;
         _player.GetComponent<PickUpSystem>().IsLocal = true;
-        _player.GetComponent<CratingSystem>().IsLocal = true;
+        _player.GetComponent<CraftingSystem>().IsLocal = true;
     }
 
     public void ChangeNickname(string newNickname)
