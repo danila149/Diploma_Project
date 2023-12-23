@@ -28,7 +28,11 @@ public class PlayerMovement : MonoBehaviour
 	private Rigidbody body;
 	private float rotationY;
 
-    private void Awake()
+	[SerializeField] private int hp = 100;
+	[SerializeField] private int Eat = 100;
+	private bool chekStartCotutine = false;
+
+	private void Awake()
     {
 		Instance = this;
 	}
@@ -72,7 +76,24 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-	void Update()
+    private void OnCollisionEnter(Collision collision)
+    {
+		if (collision.gameObject.tag == "Enemy")
+		{
+			hp--;
+			Debug.Log(hp);
+		}
+	}
+
+	IEnumerator Hunger()
+    {
+		Eat--;
+		chekStartCotutine = true;
+		yield return new WaitForSeconds(1f);
+		chekStartCotutine = false;
+	}
+
+    void Update()
 	{
         if (PlayerInput)
         {
@@ -95,11 +116,36 @@ public class PlayerMovement : MonoBehaviour
 			{
 				body.velocity = new Vector2(0, jumpForce);
 			}
-        }
+		}
         else
         {
 			Cursor.lockState = CursorLockMode.None;
 			Cursor.visible = true;
+		}
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && isGrounded == true)
+        {
+			speed = 5f;
+		}
+		else if (Input.GetKeyUp(KeyCode.LeftShift) && isGrounded == true)
+        {
+			speed = 2f;
+        }
+
+		if(hp == 0)
+        {
+			Destroy(gameObject);
+        }
+
+
+		if(chekStartCotutine == false && Eat > 0)
+        {
+			StartCoroutine(Hunger());
+        }
+
+		if(Eat <= 0)
+        {
+			speed = 0.5f;
 		}
 	}
 }

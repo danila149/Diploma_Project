@@ -6538,7 +6538,7 @@ GameObject:
   - component: {fileID: 2235431975747079510}
   m_Layer: 10
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6676,6 +6676,8 @@ MonoBehaviour:
   headMaxY: 40
   jumpButton: 32
   jumpForce: 10
+  hp: 100
+  Eat: 100
 --- !u!114 &7808368445505876748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6839,6 +6841,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildableObject: {fileID: 7766138090872662660, guid: bb47f007171245d4985e334ee09fab6d, type: 3}
+  inventory: {fileID: 7304495686271376123}
 --- !u!114 &2235431975747079510
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,22 +1,28 @@
 using UnityEngine;
+using Photon.Pun;
 
 public class BildSystem : MonoBehaviour
 {
-    public GameObject buildableObject; // Префаб объекта для строительства
+    [SerializeField] private GameObject buildableObject; // Префаб объекта для строительства
+    [SerializeField] private Inventory inventory;
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Если нажата левая кнопка мыши
+        if (inventory.SearchItemBy(ResourceType.Log, 1))
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out hit, 10))
+            if (Input.GetMouseButtonDown(0) && !Inventory.Instance.IsCrafting && !CraftingSystem.Instance.IsInventoryOpen) 
             {
-                Vector3 spawnPosition = hit.point + hit.normal; // Определите позицию, где нужно разместить объект
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 10))
+                {
+                    Vector3 spawnPosition = hit.point + hit.normal; // Определите позицию, где нужно разместить объект
 
-                Instantiate(buildableObject, spawnPosition, Quaternion.identity); // Создайте объект для строительства
+                    PhotonNetwork.Instantiate("Cube", spawnPosition, Quaternion.identity); // Создайте объект для строительства
+                    inventory.UseItemBy(ResourceType.Log, 1);
+                }
+
             }
-
         }
     }
 }

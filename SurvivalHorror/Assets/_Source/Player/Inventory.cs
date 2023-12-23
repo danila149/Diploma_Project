@@ -6,6 +6,8 @@ using Items;
 
 public class Inventory : MonoBehaviour
 {
+    public static Inventory Instance { get; private set; }
+
     public const int MAX_STACK = 99;
 
     [SerializeField] private Transform gridParent;
@@ -17,6 +19,11 @@ public class Inventory : MonoBehaviour
 
     public bool IsCrafting { get; set; }
     private Dictionary<InventoryCell, Item> inventoryData;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {

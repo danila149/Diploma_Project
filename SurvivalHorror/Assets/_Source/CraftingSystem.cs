@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class CraftingSystem : MonoBehaviour
 {
+    public static CraftingSystem Instance { get; private set; }
+
     [SerializeField] private Transform head;
     [SerializeField] private Transform hand;
     [SerializeField] private LayerMask workbenchLayerMask;
@@ -24,6 +26,11 @@ public class CraftingSystem : MonoBehaviour
 
     private Workbench _workbench = null;
     private bool isInit;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Update()
     {
