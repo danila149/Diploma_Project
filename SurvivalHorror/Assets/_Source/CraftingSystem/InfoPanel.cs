@@ -17,4 +17,20 @@ public class InfoPanel : MonoBehaviour
         this.equipmentName.text = equipmentName;
         this.description.text = description;
     }
+
+
+    public void Activate(bool active)
+    {
+        Image btnImg = btn.GetComponent<Image>();
+        if (active)
+        {
+            btnImg.color = Color.white;
+            btn.interactable = true;
+        }
+        else
+        {
+            btnImg.color = Color.gray;
+            btn.interactable = false;
+        }
+    }
 }

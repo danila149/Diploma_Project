@@ -1,6 +1,4 @@
 using Photon.Pun;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,15 +12,16 @@ public class CraftingSystem : MonoBehaviour
     [SerializeField] private Inventory inventory;
     [SerializeField] private int distanceToUse;
     [SerializeField] private GameObject craftingPanel;
+    [SerializeField] private GameObject hudUI;
     [SerializeField] private InfoPanel infoPanel;
     [SerializeField] private GameObject craftListItemPrefab;
     [SerializeField] private Transform craftListParent;
-    [SerializeField] private List<CraftData> craftables;
-
+    
+    private List<CraftData> craftables;
     private Dictionary<CraftData, CraftingListItem> craftingData;
 
     public bool IsLocal { get; set; }
-    public bool IsInventoryOpen { get; set; }
+    public bool IsCrafting { get; set; }
 
     private Workbench _workbench = null;
     private bool isInit;
@@ -36,20 +35,20 @@ public class CraftingSystem : MonoBehaviour
     {
         if (IsLocal)
         {
-            if(!isInit && craftingPanel.activeInHierarchy)
-                InitCraftingList();
 
             RaycastHit hit;
             if (Physics.Raycast(head.position, head.forward, out hit, distanceToUse, workbenchLayerMask))
             {
                 _workbench = hit.transform.gameObject.GetComponent<Workbench>();
-                if(!IsInventoryOpen)
+                craftables = _workbench.Craftables;
+                _workbench.ShowText(true);
+
+                if (!Inventory.Instance.IsInvetoryOpen && Input.GetKeyDown(KeyCode.E))
                     ShowCraftingMenu();
             }
 
             if (craftingPanel.activeInHierarchy && isInit)
             {
-                CheckForResources();
                 if(Input.GetKeyDown(KeyCode.Escape))
                     CloseCraftingMenu();
             }
@@ -58,22 +57,28 @@ public class CraftingSystem : MonoBehaviour
 
     private void ShowCraftingMenu()
     {
-        _workbench.ShowText(true);
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            inventory.IsCrafting = true;
-            craftingPanel.SetActive(true);
-            PlayerMovement.Instance.PlayerInput = false;
-        }
+        if(!isInit)
+            InitCraftingList();
+
+        IsCrafting = true;
+        craftingPanel.SetActive(true);
+        hudUI.SetActive(false);
+        PlayerMovement.Instance.PlayerInput = false;
     }
 
     private void CloseCraftingMenu()
     {
-        inventory.IsCrafting = false;
+        for (int i = 0; i < craftListParent.childCount; i++)
+        {
+            Destroy(craftListParent.GetChild(i).gameObject);
+        }
+        IsCrafting = false;
+        hudUI.SetActive(true);
         _workbench.ShowText(false);
         craftingPanel.SetActive(false);
         infoPanel.gameObject.SetActive(false);
         PlayerMovement.Instance.PlayerInput = true;
+        isInit = false;
     }
 
     private void InitCraftingList()
@@ -90,20 +95,17 @@ public class CraftingSystem : MonoBehaviour
         isInit = true;
     }
 
-    private void CheckForResources()
+    public void CheckForResources(CraftData craftData)
     {
-        foreach (CraftData craftData in craftingData.Keys)
+        foreach (Resource resource in craftData.ResourceForCraft)
         {
-            foreach (Resource resource in craftData.ResourceForCraft)
+            if (!inventory.SearchItemBy(resource.resourceType, resource.amount))
             {
-                if(!inventory.SearchItemBy(resource.resourceType, resource.amount))
-                {
-                    craftingData[craftData].Activate(false);
-                    break;
-                }
-
-                craftingData[craftData].Activate(true);
+                infoPanel.Activate(false);
+                break;
             }
+
+            infoPanel.Activate(true);
         }
     }
 
@@ -125,9 +127,11 @@ public class CraftingSystem : MonoBehaviour
             inventory.UseItemBy(resource.resourceType, resource.amount);
         }
 
+        CheckForResources(currentCraftData);
         Item craftedItem = PhotonNetwork.Instantiate(currentCraftData.ItemPrefab.name, hand.position, Quaternion.identity).GetComponent<Item>();
         craftedItem.gameObject.SetActive(false);
         craftedItem.transform.parent = hand;
+        craftedItem.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         inventory.AddItem(craftedItem);
     }
 }

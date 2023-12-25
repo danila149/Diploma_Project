@@ -8,12 +8,16 @@ public class Equipment : Item
 
     public int Durability { get => durability; set => durability = value; }
     public int Damage { get => damage; set => damage = value; }
+    public bool IsEquiped { get; set; }
 
     public EquipmentType EquipmentType => equipmentType;
 
     public override void ShowText(bool onOff)
     {
-        Text.text = $"Нажмите Е чтобы подобрать {equipmentType}";
+        if (!IsEquiped)
+            Text.text = $"Нажмите Е чтобы подобрать {equipmentType}";
+        else
+            Text.text = "";
         base.ShowText(onOff);
     }
 }

@@ -928,6 +928,8 @@ GameObject:
   - component: {fileID: 200334773}
   - component: {fileID: 200334772}
   - component: {fileID: 200334771}
+  - component: {fileID: 200334778}
+  - component: {fileID: 200334777}
   m_Layer: 0
   m_Name: EnemyWalker
   m_TagString: Enemy
@@ -969,8 +971,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04339e5c95b6c7141a83c86867e4d0f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 50
+  attackDelay: 1
   Enemy: {fileID: 200334771}
   Player: {fileID: 0}
+  playerLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
   detection: {fileID: 921559635}
   loundsSensebility: 100
   threshold: 0.1
@@ -1056,6 +1063,45 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &200334777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200334770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
+--- !u!114 &200334778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 200334770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 200334777}
+  sceneViewId: 33
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1001 &203247528
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3631,6 +3677,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 348872943}
+  craftables:
+  - {fileID: 11400000, guid: f1258c8cf684bb4448756deb0a8dd512, type: 2}
+  - {fileID: 11400000, guid: 92c85760d357fc74797108b9b1132927, type: 2}
 --- !u!54 &848025737
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6654,7 +6703,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!4 &1730433701
 Transform:

@@ -21,23 +21,9 @@ public class CraftingListItem : MonoBehaviour
         btn.onClick.AddListener(ShowInfoPanel);
     }
 
-    public void Activate(bool active)
-    {
-        Image btnImg = btn.GetComponent<Image>();
-        if (active)
-        {
-            btnImg.color = Color.white;
-            btn.interactable = true;
-        }
-        else
-        {
-            btnImg.color = Color.gray;
-            btn.interactable = false;
-        }
-    }
-
     public void ShowInfoPanel()
     {
+        this.CraftingSystem.CheckForResources(_craftData);
         InfoPanel.gameObject.SetActive(true);
         Equipment equipment;
         _craftData.ItemPrefab.TryGetComponent<Equipment>(out equipment);
@@ -51,9 +37,10 @@ public class CraftingListItem : MonoBehaviour
             }
             InfoPanel.SetInfo(equipment.ItemIcon, equipment.EquipmentType.ToString(), description);
         }
+        InfoPanel.Button.onClick.RemoveAllListeners();
         InfoPanel.Button.onClick.AddListener(OnCraftBtnClick);
     }
 
-    private void OnCraftBtnClick() =>
+    private void OnCraftBtnClick()=>
         CraftingSystem.Craft(this);
 }

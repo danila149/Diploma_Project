@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class ItemDestroyer : MonoBehaviour
 {
+    private Vector3 RESET_POSITION = new Vector3(0, 1000, 0);
+
     [SerializeField] private LayerMask itemLayerMask;
     [SerializeField] private LayerMask playerLayerMask;
 
@@ -26,7 +28,7 @@ public class ItemDestroyer : MonoBehaviour
             if (_take)
                 transform.position = _playerPos;
             else
-                gameObject.SetActive(false);
+                transform.position = RESET_POSITION;
         }
 
         if (other.gameObject.layer == _playerLayer)
@@ -35,7 +37,8 @@ public class ItemDestroyer : MonoBehaviour
             currentItem.transform.parent = hand;
             currentItem.transform.position = hand.position;
             currentItem.transform.rotation = hand.rotation;
-            gameObject.SetActive(false);
+            currentItem.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            transform.position = RESET_POSITION;
             _take = false;
         }
     }

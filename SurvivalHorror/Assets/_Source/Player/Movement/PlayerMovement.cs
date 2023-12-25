@@ -7,10 +7,11 @@ public class PlayerMovement : MonoBehaviour
 	public static PlayerMovement Instance { get; private set; }
 
 	public bool PlayerInput { get; set; }
+	public bool IsHungry { get; set; }
 
-	public float speed = 1.5f;
-
-	public Transform head;
+	[SerializeField] private float speed = 2;
+	[SerializeField] private float acceleration = 2.5f;
+	[SerializeField] private Transform head;
 
 	public float sensitivity = 5f;
 	public float headMinY = -40f;
@@ -20,6 +21,7 @@ public class PlayerMovement : MonoBehaviour
 	public float jumpForce = 10;
 
 	private bool isGrounded;
+	private bool isSprinting;
 
 
 	private Vector3 direction;
@@ -28,15 +30,10 @@ public class PlayerMovement : MonoBehaviour
 	private Rigidbody body;
 	private float rotationY;
 
-	[SerializeField] private int hp = 100;
-	[SerializeField] private int Eat = 100;
-	private bool chekStartCotutine = false;
-
 	private void Awake()
     {
 		Instance = this;
 	}
-
 
     void Start()
 	{
@@ -53,15 +50,28 @@ public class PlayerMovement : MonoBehaviour
 	{
         if (PlayerInput)
         {
+            if (Cursor.visible)
+            {
+				Cursor.lockState = CursorLockMode.Locked;
+				Cursor.visible = false;
+			}
 			body.AddForce(direction * speed, ForceMode.VelocityChange);
 
-			if (Mathf.Abs(body.velocity.x) > speed)
+            if (Mathf.Abs(body.velocity.x) > speed)
+            {
+                body.velocity = new Vector3(Mathf.Sign(body.velocity.x) * speed, body.velocity.y, body.velocity.z);
+            }
+            if (Mathf.Abs(body.velocity.z) > speed)
+            {
+                body.velocity = new Vector3(body.velocity.x, body.velocity.y, Mathf.Sign(body.velocity.z) * speed);
+            }
+        }
+        else
+        {
+			if (!Cursor.visible)
 			{
-				body.velocity = new Vector3(Mathf.Sign(body.velocity.x) * speed, body.velocity.y, body.velocity.z);
-			}
-			if (Mathf.Abs(body.velocity.z) > speed)
-			{
-				body.velocity = new Vector3(body.velocity.x, body.velocity.y, Mathf.Sign(body.velocity.z) * speed);
+				Cursor.lockState = CursorLockMode.Locked;
+				Cursor.visible = false;
 			}
 		}
 		
@@ -76,23 +86,6 @@ public class PlayerMovement : MonoBehaviour
 		}
 	}
 
-    private void OnCollisionEnter(Collision collision)
-    {
-		if (collision.gameObject.tag == "Enemy")
-		{
-			hp--;
-			Debug.Log(hp);
-		}
-	}
-
-	IEnumerator Hunger()
-    {
-		Eat--;
-		chekStartCotutine = true;
-		yield return new WaitForSeconds(1f);
-		chekStartCotutine = false;
-	}
-
     void Update()
 	{
         if (PlayerInput)
@@ -102,10 +95,11 @@ public class PlayerMovement : MonoBehaviour
 			h = Input.GetAxis("Horizontal");
 			v = Input.GetAxis("Vertical");
 
-			float rotationX = head.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivity;
+			float rotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivity;
 			rotationY += Input.GetAxis("Mouse Y") * sensitivity;
 			rotationY = Mathf.Clamp(rotationY, headMinY, headMaxY);
-			head.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
+			transform.localEulerAngles = new Vector3(0, rotationX, 0);
+			head.localEulerAngles = new Vector3(-rotationY, 0, 0);
 
 			direction = new Vector3(h, 0, v);
 			direction = head.TransformDirection(direction);
@@ -114,7 +108,7 @@ public class PlayerMovement : MonoBehaviour
 
 			if (Input.GetKeyDown(jumpButton) && isGrounded == true)
 			{
-				body.velocity = new Vector2(0, jumpForce);
+				body.AddForce(transform.up * jumpForce, ForceMode.Impulse);
 			}
 		}
         else
@@ -125,27 +119,18 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && isGrounded == true)
         {
-			speed = 5f;
+			isSprinting = true;
+			speed *= acceleration;
 		}
-		else if (Input.GetKeyUp(KeyCode.LeftShift) && isGrounded == true)
+		else if (Input.GetKeyUp(KeyCode.LeftShift) && isSprinting)
         {
-			speed = 2f;
-        }
+			isSprinting = false;
+			speed /= acceleration;
+		}
 
-		if(hp == 0)
+		if(IsHungry)
         {
-			Destroy(gameObject);
-        }
-
-
-		if(chekStartCotutine == false && Eat > 0)
-        {
-			StartCoroutine(Hunger());
-        }
-
-		if(Eat <= 0)
-        {
-			speed = 0.5f;
+			speed = 1f;
 		}
 	}
 }
