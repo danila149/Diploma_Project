@@ -2,6 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 using UnityEngine.UI;
 using TMPro;
+using Photon.Voice.PUN;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
@@ -47,6 +48,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
         _player.GetComponent<Flashlight>().IsLocal = true;
         _player.GetComponent<PickUpSystem>().IsLocal = true;
         _player.GetComponent<CraftingSystem>().IsLocal = true;
+        _player.GetComponent<BildSystem>().IsLocal = true;
+        _player.GetComponent<HealthSytem>().IsLocal = true;
+        PunVoiceClient.Instance.ConnectAndJoinRoom();
     }
 
     public void ChangeNickname(string newNickname)

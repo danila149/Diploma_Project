@@ -9,6 +9,8 @@ TagManager:
   - PickupableItem
   - itemDestroyer
   - Enemy
+  - VoiceManager
+  - Spawnpoint
   layers:
   - Default
   - TransparentFX

@@ -48,6 +48,10 @@ MonoBehaviour:
   - DisableItem
   - DropItem
   - TakeEquipment
+  - WalkForPlayer
+  - StopWalking
+  - FollowPlayer
+  - RespawnPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

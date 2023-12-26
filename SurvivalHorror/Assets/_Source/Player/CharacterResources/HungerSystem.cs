@@ -9,6 +9,7 @@ public class HungerSystem : MonoBehaviour
     [SerializeField] private float hungerPerStarve;
     [SerializeField] private HungerView hungerView;
     [SerializeField] private HealthSytem healthSytem;
+    [SerializeField] private PlayerMovement playerMovement;
 
     private float _hunger;
     private bool onStarveCooldown;
@@ -39,13 +40,20 @@ public class HungerSystem : MonoBehaviour
 
         if (_hunger <= 0)
         {
-            PlayerMovement.Instance.IsHungry = true;
+            playerMovement.IsHungry = true;
             hungerView.FoodBar.value = 0;
         }
         else
         {
+            playerMovement.IsHungry = false;
             hungerView.FoodBar.value = _hunger;
         }
+    }
+
+    public void ResetHunger()
+    {
+        _hunger = maxHunger;
+        hungerView.FoodBar.value = _hunger;
     }
 
     private IEnumerator Starve()

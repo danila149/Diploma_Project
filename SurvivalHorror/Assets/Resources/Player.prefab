@@ -7979,6 +7979,8 @@ MonoBehaviour:
   hudUI: {fileID: 7906659256445617818}
   dropPos: {fileID: 2030681629962526475}
   hotbar: {fileID: 8606232681635075570}
+  craftingSystem: {fileID: 2235431975747079510}
+  playerMovement: {fileID: 7808368445505876745}
 --- !u!114 &8606232681635075570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8007,6 +8009,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildableObject: {fileID: 7766138090872662660, guid: bb47f007171245d4985e334ee09fab6d, type: 3}
   inventory: {fileID: 6918180635225283582}
+  craftingSystem: {fileID: 2235431975747079510}
 --- !u!114 &2235431975747079510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8020,7 +8023,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   head: {fileID: 481607156735853574}
-  hand: {fileID: 3713410750601645243}
   workbenchLayerMask:
     serializedVersion: 2
     m_Bits: 512
@@ -8031,6 +8033,8 @@ MonoBehaviour:
   infoPanel: {fileID: 8150451685782105059}
   craftListItemPrefab: {fileID: 8867646913359621186, guid: aa4e08bfa2a02de42b06cf4ef6bba620, type: 3}
   craftListParent: {fileID: 4254603920593619552}
+  pickUpSystem: {fileID: 2735199412312039281}
+  playerMovement: {fileID: 7808368445505876745}
 --- !u!114 &7871724295945379114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8048,6 +8052,7 @@ MonoBehaviour:
   regenerationDelay: 1
   healthView: {fileID: 8035984433360852628}
   inventory: {fileID: 6918180635225283582}
+  hungerSystem: {fileID: 6176923154266351767}
 --- !u!114 &6176923154266351767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8061,10 +8066,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHunger: 100
-  starveDelay: 1
-  hungerPerStarve: 2
+  starveDelay: 5
+  hungerPerStarve: 1
   hungerView: {fileID: 8165224703552041356}
   healthSytem: {fileID: 7871724295945379114}
+  playerMovement: {fileID: 7808368445505876745}
 --- !u!1 &7808368446167613859
 GameObject:
   m_ObjectHideFlags: 0

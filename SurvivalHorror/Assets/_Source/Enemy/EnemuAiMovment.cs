@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -43,17 +44,16 @@ public class EnemuAiMovment : MonoBehaviour
             }
             if (Dist_player < maxDistance && chek == true)
             {
-                Enemy.SetDestination(Player.transform.position);
+                GetComponent<PhotonView>().RPC("FollowPlayer", RpcTarget.AllBuffered, Player.transform.position);
             }
             if (Dist_player > maxDistance)
             {
                 chek = false;
-                Enemy.ResetPath();
+                GetComponent<PhotonView>().RPC("StopWalking", RpcTarget.AllBuffered);
             }
             if (loudness < threshold)
                 loudness = 0;
-        }
-            
+        }   
     }
 
     private void OnCollisionStay(Collision collision)
@@ -61,6 +61,14 @@ public class EnemuAiMovment : MonoBehaviour
         if (collision.gameObject.layer == _playerLayer && !onAttackCooldown)
             StartCoroutine(Attack(collision.gameObject.GetComponent<HealthSytem>()));
     }
+
+    [PunRPC]
+    public void FollowPlayer(Vector3 playerPos)=>
+        Enemy.SetDestination(playerPos);
+
+    [PunRPC]
+    public void StopWalking()=>
+        Enemy.ResetPath();
 
     private IEnumerator Attack(HealthSytem playerHealth)
     {

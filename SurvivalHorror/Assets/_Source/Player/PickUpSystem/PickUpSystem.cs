@@ -27,7 +27,9 @@ public class PickUpSystem : MonoBehaviour
             if (Physics.Raycast(head.position, head.forward, out hit, distanceToPickUp, itemLayerMask))
             {
                 _item = hit.transform.gameObject.GetComponent<Item>();
-                PickUp(_item);
+                _item.ShowText(true);
+                if (Input.GetKeyDown(KeyCode.E))
+                    PickUp(_item);
             }
             else
             {
@@ -39,19 +41,19 @@ public class PickUpSystem : MonoBehaviour
 
     public void PickUp(Item currentItem)
     {
-        currentItem.ShowText(true);
-        if (Input.GetKeyDown(KeyCode.E))
+        if (currentItem.GetType() == typeof(Equipment))
+            if (currentItem.ToEquipment().IsEquiped)
+                return;
+
+        if (inventory.AddItem(currentItem))
         {
-            if (inventory.AddItem(currentItem))
+            GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, currentItem.transform.position);
+
+            if (currentItem.GetType() == typeof(Equipment))
             {
-                GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, currentItem.transform.position);
-
-                if (currentItem.GetType() == typeof(Equipment))
-                {
-                    GetComponent<PhotonView>().RPC("TakeEquipment", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
-                }
-
+                GetComponent<PhotonView>().RPC("TakeEquipment", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
             }
+
         }
     }
 

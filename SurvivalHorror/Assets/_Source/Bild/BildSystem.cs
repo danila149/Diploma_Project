@@ -5,23 +5,29 @@ public class BildSystem : MonoBehaviour
 {
     [SerializeField] private GameObject buildableObject;
     [SerializeField] private Inventory inventory;
+    [SerializeField] private CraftingSystem craftingSystem;
+
+    public bool IsLocal { get; set; }
 
     private void Update()
     {
-        if (inventory.SearchItemBy(ResourceType.Log, 1))
+        if (IsLocal)
         {
-            if (Input.GetMouseButtonDown(0) && !Inventory.Instance.IsInvetoryOpen && !CraftingSystem.Instance.IsCrafting) 
+            if (inventory.SearchItemBy(ResourceType.Log, 1))
             {
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out hit, 10))
+                if (Input.GetMouseButtonDown(0) && !inventory.IsInvetoryOpen && !craftingSystem.IsCrafting)
                 {
-                    Vector3 spawnPosition = hit.point + hit.normal;
+                    RaycastHit hit;
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out hit, 10))
+                    {
+                        Vector3 spawnPosition = hit.point + hit.normal;
 
-                    PhotonNetwork.Instantiate("Cube", spawnPosition, Quaternion.identity);
-                    inventory.UseItemBy(ResourceType.Log, 1);
+                        PhotonNetwork.Instantiate("Cube", spawnPosition, Quaternion.identity);
+                        inventory.UseItemBy(ResourceType.Log, 1);
+                    }
+
                 }
-
             }
         }
     }

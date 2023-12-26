@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    public static Inventory Instance { get; private set; }
-
     public const int MAX_STACK = 99;
 
     [SerializeField] private Transform gridParent;
@@ -14,14 +12,11 @@ public class Inventory : MonoBehaviour
     [SerializeField] private GameObject hudUI;
     [SerializeField] private Transform dropPos;
     [SerializeField] private Hotbar hotbar;
+    [SerializeField] private CraftingSystem craftingSystem;
+    [SerializeField] private PlayerMovement playerMovement;
 
     public bool IsInvetoryOpen { get; set; }
     private Dictionary<InventoryCell, Item> _inventoryData;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     void Start()
     {
@@ -30,7 +25,7 @@ public class Inventory : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab) && !CraftingSystem.Instance.IsCrafting)
+        if (Input.GetKeyDown(KeyCode.Tab) && !craftingSystem.IsCrafting)
         {
             if (inventoryUI.activeInHierarchy)
             {
@@ -38,12 +33,12 @@ public class Inventory : MonoBehaviour
                 inventoryUI.SetActive(false);
                 hudUI.SetActive(true);
                 HotbarUpdateUI();
-                PlayerMovement.Instance.PlayerInput = true;
+                playerMovement.PlayerInput = true;
             }
             else
             {
                 IsInvetoryOpen = true;
-                PlayerMovement.Instance.PlayerInput = false;
+                playerMovement.PlayerInput = false;
                 hudUI.SetActive(false);
                 inventoryUI.SetActive(true);
             }
@@ -57,6 +52,8 @@ public class Inventory : MonoBehaviour
         {
             InventoryCell currentCell = gridParent.GetChild(i).GetComponent<InventoryCell>();
             _inventoryData.Add(currentCell, null);
+            currentCell.SetItemCount("");
+            currentCell.SetSprite(null);
             currentCell.IsEmpty = true;
             currentCell.Inventory = this;
         }
@@ -166,10 +163,7 @@ public class Inventory : MonoBehaviour
     {
         Item item = _inventoryData[cell];
         SetItemToCell(cell, null);
-        if(item.GetType() == typeof(Resource))
-            DropItem(item.ToResource());
-        else if(item.GetType() == typeof(Equipment))
-            DropItem(item.ToEquipment());
+        DropItem(item);
     }
     private void DropItem(Item item)
     {
@@ -183,13 +177,14 @@ public class Inventory : MonoBehaviour
 
     public void DropAll()
     {
-        Dictionary<InventoryCell, Item> helper = _inventoryData;
         foreach (InventoryCell cell in _inventoryData.Keys)
         {
-            if (_inventoryData[cell] == null)
-                break;
-            DropItem(_inventoryData[cell]);
+            if (_inventoryData[cell] != null)
+                DropItem(_inventoryData[cell]);
         }
+
+        Init();
+        HotbarUpdateUI();
     }
 
     public bool SearchItemBy(ResourceType resourceType, int amount)

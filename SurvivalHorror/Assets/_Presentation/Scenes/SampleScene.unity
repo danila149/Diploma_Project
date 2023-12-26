@@ -446,6 +446,37 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46fdf5182016d9a4d8ba505206b04f1e, type: 3}
+--- !u!1 &143062746
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 143062747}
+  m_Layer: 9
+  m_Name: Spawnpoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &143062747
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 143062746}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.46, y: 1.307, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 848025735}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &144952658
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2550,7 +2581,7 @@ GameObject:
   - component: {fileID: 616915690}
   m_Layer: 0
   m_Name: spawnpoint
-  m_TagString: Untagged
+  m_TagString: Spawnpoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3661,6 +3692,7 @@ Transform:
   - {fileID: 769937867}
   - {fileID: 1162860327}
   - {fileID: 2123094431}
+  - {fileID: 143062747}
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3680,6 +3712,7 @@ MonoBehaviour:
   craftables:
   - {fileID: 11400000, guid: f1258c8cf684bb4448756deb0a8dd512, type: 2}
   - {fileID: 11400000, guid: 92c85760d357fc74797108b9b1132927, type: 2}
+  spawnpoint: {fileID: 143062747}
 --- !u!54 &848025737
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4581,7 +4614,7 @@ GameObject:
   - component: {fileID: 1169196534}
   m_Layer: 0
   m_Name: VoiceManager
-  m_TagString: Untagged
+  m_TagString: VoiceManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4682,7 +4715,7 @@ MonoBehaviour:
     EnableLobbyStatistics: 0
     NetworkLogging: 1
   ShowSettings: 1
-  AutoConnectAndJoin: 1
+  AutoConnectAndJoin: 0
   usePunAppSettings: 1
   usePunAuthValues: 1
 --- !u!1 &1216669865

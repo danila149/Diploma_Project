@@ -33,13 +33,18 @@ public class ItemDestroyer : MonoBehaviour
 
         if (other.gameObject.layer == _playerLayer)
         {
-            Transform hand = other.transform.GetChild(0).GetChild(2);
-            currentItem.transform.parent = hand;
-            currentItem.transform.position = hand.position;
-            currentItem.transform.rotation = hand.rotation;
-            currentItem.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            if(currentItem.GetComponent<Item>().GetType() != typeof(Items.Resource))
+            {
+                Transform hand = other.transform.GetChild(0).GetChild(2);
+                currentItem.transform.parent = hand;
+                currentItem.transform.position = hand.position;
+                currentItem.transform.rotation = hand.rotation;
+                currentItem.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+                currentItem.GetComponent<BoxCollider>().isTrigger = true;
+                transform.position = RESET_POSITION;
+                _take = false;
+            }
             transform.position = RESET_POSITION;
-            _take = false;
         }
     }
 

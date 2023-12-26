@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-	public static PlayerMovement Instance { get; private set; }
-
 	public bool PlayerInput { get; set; }
 	public bool IsHungry { get; set; }
 
@@ -29,11 +27,6 @@ public class PlayerMovement : MonoBehaviour
 	private int layerMask;
 	private Rigidbody body;
 	private float rotationY;
-
-	private void Awake()
-    {
-		Instance = this;
-	}
 
     void Start()
 	{

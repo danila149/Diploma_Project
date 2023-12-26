@@ -6,8 +6,10 @@ public class Workbench : MonoBehaviour
 {
     [SerializeField] private TextMeshPro text;
     [SerializeField] private List<CraftData> craftables;
+    [SerializeField] private Transform spawnpoint;
 
     public List<CraftData> Craftables => craftables;
+    public Transform Spawnpoint => spawnpoint;
 
     public void ShowText(bool onOff)
     {
