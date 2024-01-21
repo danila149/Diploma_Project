@@ -7697,10 +7697,10 @@ GameObject:
   - component: {fileID: 2735199412312039281}
   - component: {fileID: 6918180635225283582}
   - component: {fileID: 8606232681635075570}
-  - component: {fileID: 5767511142992588346}
   - component: {fileID: 2235431975747079510}
   - component: {fileID: 7871724295945379114}
   - component: {fileID: 6176923154266351767}
+  - component: {fileID: 262502295589367802}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -7995,21 +7995,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridParent: {fileID: 2639118861262829090}
   hand: {fileID: 3713410750601645243}
---- !u!114 &5767511142992588346
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7808368445505876743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df9ba118c767a7a4bbda686bd82b11e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buildableObject: {fileID: 7766138090872662660, guid: bb47f007171245d4985e334ee09fab6d, type: 3}
-  inventory: {fileID: 6918180635225283582}
-  craftingSystem: {fileID: 2235431975747079510}
 --- !u!114 &2235431975747079510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8071,6 +8056,27 @@ MonoBehaviour:
   hungerView: {fileID: 8165224703552041356}
   healthSytem: {fileID: 7871724295945379114}
   playerMovement: {fileID: 7808368445505876745}
+--- !u!114 &262502295589367802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7808368445505876743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c71b3bcf43b89d34195f92375394c695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objects:
+  - {fileID: 2847477098285921440, guid: 9f8b3023179e16d4abcd94ea9a0068b7, type: 3}
+  - {fileID: 2847477098285921440, guid: 9f8b3023179e16d4abcd94ea9a0068b7, type: 3}
+  - {fileID: 8790775540537922161, guid: 45f74ca06cd0d1f4dac194e0dec39abc, type: 3}
+  - {fileID: 7672967448751482092, guid: 8be0a8bf1ef040f4ab3f0e7be81dce30, type: 3}
+  - {fileID: 8790775540537922161, guid: 24375a22b9aeeb142a24d85644ac120e, type: 3}
+  - {fileID: 8790775540537922161, guid: a595e529bc202444b99f77f511f1156c, type: 3}
+  - {fileID: 7672967448751482092, guid: 91c642e07d35b0943a5044f68ed49479, type: 3}
+  selected: 0
 --- !u!1 &7808368446167613859
 GameObject:
   m_ObjectHideFlags: 0
@@ -8082,6 +8088,7 @@ GameObject:
   - component: {fileID: 7808368446167613862}
   - component: {fileID: 7808368446167613857}
   - component: {fileID: 7808368446167613856}
+  - component: {fileID: 3244310248373123558}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -8155,6 +8162,22 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7808368446167613859}
   m_Enabled: 1
+--- !u!114 &3244310248373123558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7808368446167613859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17b6e82f757153742b0c1d1302888708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 0}
+  created: {fileID: 0}
+  rot: {x: 0, y: 0, z: 0}
+  inventory: {fileID: 6918180635225283582}
 --- !u!1 &7815809149609688750
 GameObject:
   m_ObjectHideFlags: 0

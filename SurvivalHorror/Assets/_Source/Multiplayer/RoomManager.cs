@@ -48,7 +48,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         _player.GetComponent<Flashlight>().IsLocal = true;
         _player.GetComponent<PickUpSystem>().IsLocal = true;
         _player.GetComponent<CraftingSystem>().IsLocal = true;
-        _player.GetComponent<BildSystem>().IsLocal = true;
         _player.GetComponent<HealthSytem>().IsLocal = true;
         PunVoiceClient.Instance.ConnectAndJoinRoom();
     }

@@ -7,7 +7,7 @@ public class CraftingListItem : MonoBehaviour
     [SerializeField] private Button btn;
     [SerializeField] private Image img;
     [SerializeField] private TextMeshProUGUI text;
-    
+
     public InfoPanel InfoPanel { get; set; }
     public CraftingSystem CraftingSystem { get; set; }
 
@@ -41,6 +41,6 @@ public class CraftingListItem : MonoBehaviour
         InfoPanel.Button.onClick.AddListener(OnCraftBtnClick);
     }
 
-    private void OnCraftBtnClick()=>
+    private void OnCraftBtnClick() =>
         CraftingSystem.Craft(this);
 }
