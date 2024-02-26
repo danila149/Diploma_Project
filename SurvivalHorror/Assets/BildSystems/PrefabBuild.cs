@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,9 @@ public class PrefabBuild : MonoBehaviour
     public Transform ray;
     public bool can;
     public Material canM,cantM;
+
+    public bool IsHologram { get; set; }
+
     private void Start()
     {
         colliders = GetComponentsInChildren<Collider>();
@@ -26,30 +30,35 @@ public class PrefabBuild : MonoBehaviour
 
     private void Update()
     {
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray.transform.position, ray.transform.forward, out hit, 1.5f))
+        if(IsHologram)
         {
-            if (hit.transform.tag != "Ground")
-                can = false;
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray.transform.position, ray.transform.forward, out hit, 1.5f))
+            {
+                if (hit.transform.tag != "Ground")
+                    can = false;
+                else
+                    can = true;
+            }
             else
+            {
                 can = true;
-        }
-        else
-        {
-            can = true;
-        }
+            }
 
-        for (int i = 0; i < meshes.Length; i++)
-        {
-            meshes[i].GetComponent<Renderer>().material = can ? canM : cantM;
+            for (int i = 0; i < meshes.Length; i++)
+            {
+                meshes[i].GetComponent<Renderer>().material = can ? canM : cantM;
+            }
         }
     }
 
 
-    public bool Place(Vector3 pos, Vector3 local)
-    {   transform.position = pos;
-       transform.localEulerAngles = local;
+    public bool Place(Vector3 pos, Vector3 rot, string prefabName)
+    {
+        if(can)
+            PhotonNetwork.Instantiate(prefabName, pos, Quaternion.Euler(rot));
+
         if (can)
         {
             for (int i = 0; i < meshes.Length; i++)

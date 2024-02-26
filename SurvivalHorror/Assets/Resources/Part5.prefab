@@ -429,6 +429,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1916626774391309845}
   - component: {fileID: -8948400046904621728}
+  - component: {fileID: -6872965422777166237}
+  - component: {fileID: -7176663564861907585}
   m_Layer: 0
   m_Name: Part5
   m_TagString: Untagged
@@ -473,3 +475,41 @@ MonoBehaviour:
   can: 0
   canM: {fileID: 2100000, guid: 15a98afc9c7aecf47b63acd8e492cf99, type: 2}
   cantM: {fileID: 2100000, guid: b77a2f5a5468f5541b77d545cc41c807, type: 2}
+--- !u!114 &-6872965422777166237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8790775540537922161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &-7176663564861907585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8790775540537922161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1

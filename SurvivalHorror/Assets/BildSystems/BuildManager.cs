@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ public class BuildManager : MonoBehaviour
     public Vector3 rot;
     [SerializeField] private Inventory inventory;
     Quaternion trot;
-    // Update is called once per frame
+
     void Update()
     {   
         if (created != null){
@@ -34,6 +35,7 @@ public class BuildManager : MonoBehaviour
                     if (created == null)
                     {
                         created = Instantiate(prefab, pos, Quaternion.Euler(rot));
+                        created.GetComponent<PrefabBuild>().IsHologram = true;
                     }
                     else
                     {
@@ -43,7 +45,7 @@ public class BuildManager : MonoBehaviour
                         }
                         if (Input.GetKeyDown(KeyCode.Mouse0))
                         {
-                            if (created.GetComponent<PrefabBuild>().Place(pos, rot))
+                            if (created.GetComponent<PrefabBuild>().Place(pos, rot, prefab.name))
                             {
                                 created = null;
                                 inventory.UseItemBy(ResourceType.Log, 1);

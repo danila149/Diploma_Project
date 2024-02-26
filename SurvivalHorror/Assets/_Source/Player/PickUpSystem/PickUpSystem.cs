@@ -10,6 +10,8 @@ public class PickUpSystem : MonoBehaviour
     [SerializeField] private GameObject itemDestroyer;
     [SerializeField] private Inventory inventory;
     [SerializeField] private GameObject aim;
+    [SerializeField] private Transform pickupItemInfoParent;
+    [SerializeField] private GameObject pickupItemInfoPrefab;
 
     public bool IsLocal { get; set; }
 
@@ -47,13 +49,20 @@ public class PickUpSystem : MonoBehaviour
 
         if (inventory.AddItem(currentItem))
         {
+            PickUpItemInfo pickUpItemInfo;
             GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, currentItem.transform.position);
 
             if (currentItem.GetType() == typeof(Equipment))
             {
                 GetComponent<PhotonView>().RPC("TakeEquipment", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
+
+                pickUpItemInfo = Instantiate(pickupItemInfoPrefab, pickupItemInfoParent).GetComponent<PickUpItemInfo>();
+                pickUpItemInfo.SetInfo("1", currentItem.ItemIcon, currentItem.ToEquipment().EquipmentType.ToString());
+                return;
             }
 
+            pickUpItemInfo = Instantiate(pickupItemInfoPrefab, pickupItemInfoParent).GetComponent<PickUpItemInfo>();
+            pickUpItemInfo.SetInfo(currentItem.ToResource().Amount.ToString(), currentItem.ItemIcon, currentItem.ToResource().ResourceType.ToString());
         }
     }
 
