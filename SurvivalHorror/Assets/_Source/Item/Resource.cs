@@ -9,11 +9,5 @@ namespace Items
 
         public ResourceType ResourceType => resourceType;
         public int Amount { get => amount; set => amount = value; }
-
-        public override void ShowText(bool onOff)
-        {
-            Text.text = $"Нажмите Е чтобы подобрать {amount} {resourceType}";
-            base.ShowText(onOff);
-        }
     }
 }

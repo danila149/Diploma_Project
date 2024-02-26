@@ -3,23 +3,24 @@ using Photon.Pun;
 using UnityEngine.UI;
 using TMPro;
 using Photon.Voice.PUN;
+using Photon.Realtime;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
+    private const string NICKNAME = "NICKNAME";
+
     public static RoomManager Instance { get; private set; }
 
     [SerializeField] private GameObject playerPrefab;
     [Space]
     [SerializeField] private Transform spawnPos;
-    [SerializeField] private GameObject roomCam;
     [Header("UI")]
     [SerializeField] private GameObject connectionScreen;
-    [SerializeField] private GameObject nicknameScreen;
-    [SerializeField] private Button joinBtn;
     [SerializeField] private TMP_InputField inputNickname;
 
     private string nickname = "Player";
     public string roomNameToJoin = "test";
+    public RoomOptions options = null;
 
     private void Awake()
     {
@@ -28,7 +29,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        joinBtn.onClick.AddListener(JoinRoomButtonPressed);
+        nickname = PlayerPrefs.GetString(NICKNAME);
         inputNickname.onValueChanged.AddListener(ChangeNickname);
     }
 
@@ -36,34 +37,33 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
-        roomCam.SetActive(false);
-        RespawnPlayer();
-    }
-
-    public void RespawnPlayer()
-    {
-        GameObject _player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPos.position, Quaternion.identity);
-        _player.GetComponent<PhotonView>().RPC("SetNickname", RpcTarget.AllBuffered, nickname);
-        _player.GetComponent<PlayerSetup>().IsLocalPlayer();
-        _player.GetComponent<Flashlight>().IsLocal = true;
-        _player.GetComponent<PickUpSystem>().IsLocal = true;
-        _player.GetComponent<CraftingSystem>().IsLocal = true;
-        _player.GetComponent<HealthSytem>().IsLocal = true;
-        PunVoiceClient.Instance.ConnectAndJoinRoom();
+        connectionScreen.SetActive(false);
+        PhotonNetwork.LoadLevel(1);
     }
 
     public void ChangeNickname(string newNickname)
     {
         nickname = newNickname;
+        PlayerPrefs.SetString(NICKNAME, newNickname);
     }
 
     public void JoinRoomButtonPressed()
     {
-        joinBtn.onClick.RemoveListener(JoinRoomButtonPressed);
         inputNickname.onValueChanged.RemoveListener(ChangeNickname);
-        nicknameScreen.SetActive(false);
         connectionScreen.SetActive(true);
 
-        PhotonNetwork.JoinOrCreateRoom(roomNameToJoin, null, null);
+        
+
+        if (options != null)
+        {
+            PhotonNetwork.JoinOrCreateRoom(roomNameToJoin, options, null);
+        }
+        else
+            PhotonNetwork.JoinOrCreateRoom(roomNameToJoin, null, null);
+    }
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
     }
 }

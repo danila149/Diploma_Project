@@ -9,6 +9,7 @@ public class PickUpSystem : MonoBehaviour
     [SerializeField] private float distanceToPickUp;
     [SerializeField] private GameObject itemDestroyer;
     [SerializeField] private Inventory inventory;
+    [SerializeField] private GameObject aim;
 
     public bool IsLocal { get; set; }
 
@@ -26,15 +27,14 @@ public class PickUpSystem : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(head.position, head.forward, out hit, distanceToPickUp, itemLayerMask))
             {
+                aim.SetActive(true);
                 _item = hit.transform.gameObject.GetComponent<Item>();
-                _item.ShowText(true);
                 if (Input.GetKeyDown(KeyCode.E))
                     PickUp(_item);
             }
             else
             {
-                if (_item != null)
-                    _item.ShowText(false);
+                aim.SetActive(false);
             }
         }
     }

@@ -11,13 +11,4 @@ public class Equipment : Item
     public bool IsEquiped { get; set; }
 
     public EquipmentType EquipmentType => equipmentType;
-
-    public override void ShowText(bool onOff)
-    {
-        if (!IsEquiped)
-            Text.text = $"Нажмите Е чтобы подобрать {equipmentType}";
-        else
-            Text.text = "";
-        base.ShowText(onOff);
-    }
 }

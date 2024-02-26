@@ -1,3 +1,4 @@
+using Character;
 using Photon.Pun;
 using TMPro;
 using UnityEngine;
@@ -10,12 +11,14 @@ public class PlayerSetup : MonoBehaviour
     [SerializeField] private GameObject camera;
     [SerializeField] private GameObject hud;
     [SerializeField] private TextMeshPro nicknameText;
+    [SerializeField] private InputListener inputListener;
 
     public void IsLocalPlayer()
     {
         movement.enabled = true;
         crafting.enabled = true;
         inventory.enabled = true;
+        inputListener.gameObject.SetActive(true);
         camera.SetActive(true);
         hud.SetActive(true);
         nicknameText.gameObject.SetActive(false);

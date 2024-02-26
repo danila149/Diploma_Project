@@ -4,18 +4,24 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.UI;
 
 public class RoomList : MonoBehaviourPunCallbacks
 {
     public static RoomList Instance { get; private set; }
 
-    [SerializeField] private GameObject roomManagerObjcet;
     [SerializeField] private RoomManager roomManager;
     [SerializeField] private Transform roomListParent;
     [SerializeField] private GameObject roomListItemPrefab;
     [Header("UI")]
     [SerializeField] private TMP_InputField inputLobbyName;
+    [SerializeField] private Button createRoomBtn;
+    [SerializeField] private GameObject passwordPanel;
+    [SerializeField] private TMP_InputField passwordInput;
+    [SerializeField] private Button passwordConfirm;
+    [SerializeField] private GameObject error;
 
+    private string _currentPassword;
     private List<RoomInfo> _cachedRoomList = new List<RoomInfo>();
 
     IEnumerator Start()
@@ -33,8 +39,9 @@ public class RoomList : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        passwordConfirm.onClick.AddListener(JoinRoomWithPassword);
         Instance = this;
-        inputLobbyName.onValueChanged.AddListener(ChangeRoomToCreateName);
+        createRoomBtn.onClick.AddListener(delegate { ChangeRoomToCreateName(inputLobbyName.text); });
     }
 
     public override void OnConnectedToMaster()
@@ -67,6 +74,7 @@ public class RoomList : MonoBehaviourPunCallbacks
                         else
                         {
                             newList[i] = room;
+                            Debug.Log(room.CustomProperties.Count);
                         }
 
                         _cachedRoomList = newList;
@@ -88,7 +96,14 @@ public class RoomList : MonoBehaviourPunCallbacks
         {
             GameObject _roomitem = Instantiate(roomListItemPrefab, roomListParent);
             _roomitem.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = room.Name;
-            _roomitem.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = room.PlayerCount + "/16";
+            _roomitem.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = room.PlayerCount + "/" + room.MaxPlayers;
+            foreach (var key in room.CustomProperties.Keys)
+            {
+                if(key.Equals("private"))
+                {
+                    _roomitem.transform.GetChild(2).gameObject.SetActive((bool)room.CustomProperties[key]);
+                }
+            }
             _roomitem.GetComponent<RoomitemButton>().RoomName = room.Name;
         }
     }
@@ -96,9 +111,42 @@ public class RoomList : MonoBehaviourPunCallbacks
     public void JoinRoomByName(string name)
     {
         roomManager.roomNameToJoin = name;
-        roomManagerObjcet.SetActive(true);
-        inputLobbyName.onValueChanged.RemoveListener(ChangeRoomToCreateName);
-        gameObject.SetActive(false);
+
+        foreach (var room in _cachedRoomList)
+        {
+            if(room.Name == name)
+            {
+                foreach (var key in room.CustomProperties.Keys)
+                {
+                    if (key.Equals("password"))
+                    {
+                        _currentPassword = room.CustomProperties[key].ToString();
+                        Debug.Log(_currentPassword);
+                        error.SetActive(false);
+                        passwordPanel.SetActive(true);
+                        return;
+                    }
+                }
+            }
+        }
+        roomManager.JoinRoomButtonPressed();
+        createRoomBtn.onClick.RemoveListener(delegate { ChangeRoomToCreateName(inputLobbyName.text); });
+    }
+
+    private void JoinRoomWithPassword()
+    {
+        Debug.Log(_currentPassword + " " + passwordInput.text);
+        if(_currentPassword == passwordInput.text)
+        {
+            passwordPanel.SetActive(false);
+            error.SetActive(false);
+            roomManager.JoinRoomButtonPressed();
+        }
+        else
+        {
+            passwordInput.text = "";
+            error.SetActive(true);
+        }
     }
 
     public void ChangeRoomToCreateName(string roomName)

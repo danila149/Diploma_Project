@@ -15,6 +15,7 @@ public class CraftingSystem : MonoBehaviour
     [SerializeField] private Transform craftListParent;
     [SerializeField] private PickUpSystem pickUpSystem;
     [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private GameObject aim;
 
     private Transform _spawnpoint;
     private List<CraftData> _craftables;
@@ -37,7 +38,7 @@ public class CraftingSystem : MonoBehaviour
                 _workbench = hit.transform.gameObject.GetComponent<Workbench>();
                 _craftables = _workbench.Craftables;
                 _spawnpoint = _workbench.Spawnpoint;
-                _workbench.ShowText(true);
+                aim.SetActive(true);
 
                 if (!inventory.IsInvetoryOpen && Input.GetKeyDown(KeyCode.E))
                     ShowCraftingMenu();
@@ -70,7 +71,6 @@ public class CraftingSystem : MonoBehaviour
         }
         IsCrafting = false;
         hudUI.SetActive(true);
-        _workbench.ShowText(false);
         craftingPanel.SetActive(false);
         infoPanel.gameObject.SetActive(false);
         playerMovement.PlayerInput = true;
