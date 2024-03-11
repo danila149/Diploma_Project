@@ -10,7 +10,7 @@ public class PickUpItemInfo : MonoBehaviour
     [SerializeField] private Image image;
     [SerializeField] private TextMeshProUGUI itemNameText;
 
-    public void SetInfo(string amount, Sprite itemIcon, string itemName)
+    public void SetInfo(int amount, Sprite itemIcon, string itemName)
     {
         amountText.text = "+"+amount;
         image.sprite = itemIcon;

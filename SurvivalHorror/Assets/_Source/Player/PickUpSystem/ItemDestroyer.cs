@@ -40,7 +40,11 @@ public class ItemDestroyer : MonoBehaviour
                 currentItem.transform.position = hand.position;
                 currentItem.transform.rotation = hand.rotation;
                 currentItem.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-                currentItem.GetComponent<BoxCollider>().isTrigger = true;
+                Equipment equipment = new Equipment();
+                if(currentItem.TryGetComponent<Equipment>(out equipment))
+                    currentItem.GetComponent<BoxCollider>().isTrigger = true;
+                else
+                    currentItem.GetComponent<MeshCollider>().isTrigger = true;
                 transform.position = RESET_POSITION;
                 _take = false;
             }

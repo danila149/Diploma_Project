@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1378003267613614185}
   - component: {fileID: 7137124916080726488}
   - component: {fileID: 3375577193244578895}
-  - component: {fileID: 7137124916080726493}
   - component: {fileID: 2122145669417941360}
+  - component: {fileID: 4706351229622372431}
   m_Layer: 6
   m_Name: StoneSword
   m_TagString: Untagged
@@ -70,19 +70,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &7137124916080726493
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1378003267613614186}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.04, y: 1.1, z: 0.26}
-  m_Center: {x: 0, y: 0.51, z: 0}
 --- !u!114 &2122145669417941360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,6 +92,19 @@ MonoBehaviour:
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!65 &4706351229622372431
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1378003267613614186}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.04, y: 1.1, z: 0.26}
+  m_Center: {x: 0, y: 0.51, z: 0}
 --- !u!1 &1378003267800801487
 GameObject:
   m_ObjectHideFlags: 0

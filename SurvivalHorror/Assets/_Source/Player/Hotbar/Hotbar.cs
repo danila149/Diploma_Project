@@ -7,9 +7,12 @@ public class Hotbar : MonoBehaviour
 {
     [SerializeField] private Transform gridParent;
     [SerializeField] private Transform hand;
+    [SerializeField] private HungerSystem hungerSystem;
+    [SerializeField] private Inventory inventory;
+    [SerializeField] private CraftingSystem craftingSystem;
 
-    private Dictionary<InventoryCell, Item> hotbarData;
-    private List<HotbarCellData> hotbarCells;
+    private Dictionary<InventoryCell, Item> _hotbarData;
+    private List<HotbarCellData> _hotbarCells;
     private InventoryCell _currentActiveCell;
 
     void Start()
@@ -20,33 +23,66 @@ public class Hotbar : MonoBehaviour
     private void Update()
     {
         ChooseCell();
+        if (_hotbarData[_currentActiveCell]?.GetType() == typeof(Food))
+        {
+            if (Input.GetMouseButtonDown(0) && !inventory.IsInvetoryOpen && !craftingSystem.IsCrafting)
+            {
+                if (!hungerSystem.IsFullHunger)
+                {
+                    hungerSystem.ChangeValue(_hotbarData[_currentActiveCell].ToFood().Saturation);
+                    _hotbarData[_currentActiveCell].ToFood().Amount--;
+                    if (_hotbarData[_currentActiveCell].ToFood().Amount != 0)
+                        _currentActiveCell.SetItemCount(_hotbarData[_currentActiveCell].ToFood().Amount.ToString());
+                    else
+                    {
+                        _currentActiveCell.SetItemCount("");
+                        _currentActiveCell.SetSprite(null);
+                        _hotbarData[_currentActiveCell] = null;
+                    }
+
+                    UpdateInventory();
+                }
+            }
+        }
     }
 
     private void Init()
     {
-        hotbarData = new Dictionary<InventoryCell, Item>();
-        hotbarCells = new List<HotbarCellData>();
+        _hotbarData = new Dictionary<InventoryCell, Item>();
+        _hotbarCells = new List<HotbarCellData>();
         for (int i = 0; i < gridParent.childCount; i++)
         {
             InventoryCell currentCell = gridParent.GetChild(i).GetChild(0).GetComponent<InventoryCell>();
 
-            hotbarData.Add(currentCell, null);
-            hotbarCells.Add( new HotbarCellData(gridParent.GetChild(i).GetComponent<Outline>(),currentCell));
+            _hotbarData.Add(currentCell, null);
+            _hotbarCells.Add( new HotbarCellData(gridParent.GetChild(i).GetComponent<Outline>(),currentCell));
             currentCell.IsEmpty = true;
 
             if (_currentActiveCell == null)
             {
                 _currentActiveCell = currentCell;
-                hotbarCells[0].CellOutline.enabled = true;
+                _hotbarCells[0].CellOutline.enabled = true;
             }
         }
+    }
+
+    public void UpdateInventory()
+    {
+        int counter = 0;
+        foreach (InventoryCell cell in _hotbarData.Keys)
+        {
+            if (cell == _currentActiveCell)
+                break;
+            counter++;
+        }
+        inventory.UpdateInventory(counter,_hotbarData[_currentActiveCell]);
     }
 
     public void UpdateUi(List<Item> items)
     {
         int count = 0;
         Dictionary<InventoryCell, Item> newHotbarData = new Dictionary<InventoryCell, Item>();
-        foreach (InventoryCell cell in hotbarData.Keys)
+        foreach (InventoryCell cell in _hotbarData.Keys)
         {
             newHotbarData.Add(cell, items[count]);
             if (items[count] == null)
@@ -59,11 +95,13 @@ public class Hotbar : MonoBehaviour
                 cell.SetSprite(items[count].ItemIcon);
                 if(items[count].GetType() == typeof(Items.Resource))
                     cell.SetItemCount(items[count].ToResource().Amount.ToString());
+                else if (items[count].GetType() == typeof(Food))
+                    cell.SetItemCount(items[count].ToFood().Amount.ToString());
             }
             count++;
         }
-        hotbarData = newHotbarData;
-        ShowEquipment();
+        _hotbarData = newHotbarData;
+        ShowItem();
     }
 
     public void ChooseCell()
@@ -105,7 +143,7 @@ public class Hotbar : MonoBehaviour
         }
     }
 
-    private void ShowEquipment()
+    private void ShowItem()
     {
         if(hand.childCount > 0)
         {
@@ -115,19 +153,22 @@ public class Hotbar : MonoBehaviour
             }
         }
 
-        if (hotbarData[_currentActiveCell]?.GetType() == typeof(Equipment))
+        if (_hotbarData[_currentActiveCell]?.GetType() == typeof(Equipment))
         {
-            hotbarData[_currentActiveCell].gameObject.SetActive(true);
+            _hotbarData[_currentActiveCell].gameObject.SetActive(true);
+        } else if(_hotbarData[_currentActiveCell]?.GetType() == typeof(Food))
+        {
+            _hotbarData[_currentActiveCell].gameObject.SetActive(true);
         }
     }
 
     private void ActivateCell(int cellIndex)
     {
-        foreach (HotbarCellData hotbarCell in hotbarCells)
+        foreach (HotbarCellData hotbarCell in _hotbarCells)
             hotbarCell.CellOutline.enabled = false;
 
-        hotbarCells[cellIndex].CellOutline.enabled = true;
-        _currentActiveCell = hotbarCells[cellIndex].InventoryCell;
-        ShowEquipment();
+        _hotbarCells[cellIndex].CellOutline.enabled = true;
+        _currentActiveCell = _hotbarCells[cellIndex].InventoryCell;
+        ShowItem();
     }
 }

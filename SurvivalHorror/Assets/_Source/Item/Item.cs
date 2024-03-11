@@ -1,5 +1,4 @@
-﻿using TMPro;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Item : MonoBehaviour
 {
@@ -12,4 +11,7 @@ public class Item : MonoBehaviour
 
     public Equipment ToEquipment() =>
         (Equipment)this;
+
+    public Food ToFood() =>
+        (Food)this;
 }
