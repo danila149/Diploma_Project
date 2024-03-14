@@ -108,59 +108,63 @@ public class Inventory : MonoBehaviour
         {
             if(_inventoryData[cell]?.GetType() != typeof(Equipment))
             {
-                if (newItem.GetType()== typeof(Resource))
+                if (newItem.GetType()== typeof(Items.Resource))
                 {
                     Items.Resource currentNewItem = newItem.ToResource();
-
-                    if (_inventoryData[cell]?.ToResource().ResourceType == currentNewItem.ResourceType && _inventoryData[cell]?.ToResource().Amount < MAX_STACK)
+                    if(_inventoryData[cell]?.GetType() != typeof(Food))
                     {
-                        if (_inventoryData[cell].ToResource()?.Amount + currentNewItem.Amount > MAX_STACK)
+                        if (_inventoryData[cell]?.ToResource().ResourceType == currentNewItem.ResourceType && _inventoryData[cell]?.ToResource().Amount < MAX_STACK)
                         {
-                            Items.Resource currenItem = _inventoryData[cell].ToResource();
-                            currentNewItem.Amount = currentNewItem.Amount - (MAX_STACK - currenItem.Amount);
-                            currenItem.Amount += MAX_STACK - currenItem.Amount;
-                            SetItemToCell(cell, currenItem);
-                            HotbarUpdateUI();
-                            if (!AddItem(newItem))
-                                DropItem(currentNewItem);
+                            if (_inventoryData[cell].ToResource()?.Amount + currentNewItem.Amount > MAX_STACK)
+                            {
+                                Items.Resource currenItem = _inventoryData[cell].ToResource();
+                                currentNewItem.Amount = currentNewItem.Amount - (MAX_STACK - currenItem.Amount);
+                                currenItem.Amount += MAX_STACK - currenItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                if (!AddItem(newItem))
+                                    DropItem(currentNewItem);
 
-                            return true;
-                        }
-                        else
-                        {
-                            Items.Resource currenItem = _inventoryData[cell].ToResource();
-                            currenItem.Amount += currentNewItem.Amount;
-                            SetItemToCell(cell, currenItem);
-                            HotbarUpdateUI();
-                            return true;
+                                return true;
+                            }
+                            else
+                            {
+                                Items.Resource currenItem = _inventoryData[cell].ToResource();
+                                currenItem.Amount += currentNewItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                return true;
+                            }
                         }
                     }
                 }
                 else if(newItem.GetType()== typeof(Food))
                 {
                     Food currentNewItem = newItem.ToFood();
-
-                    if (_inventoryData[cell]?.ToFood().FoodType == currentNewItem.FoodType && _inventoryData[cell]?.ToFood().Amount < MAX_FOOD_STACK)
+                    if (_inventoryData[cell]?.GetType() != typeof(Items.Resource))
                     {
-                        if (_inventoryData[cell].ToFood()?.Amount + currentNewItem.Amount > MAX_FOOD_STACK)
+                        if (_inventoryData[cell]?.ToFood().FoodType == currentNewItem.FoodType && _inventoryData[cell]?.ToFood().Amount < MAX_FOOD_STACK)
                         {
-                            Food currenItem = _inventoryData[cell].ToFood();
-                            currentNewItem.Amount = currentNewItem.Amount - (MAX_FOOD_STACK - currenItem.Amount);
-                            currenItem.Amount += MAX_FOOD_STACK - currenItem.Amount;
-                            SetItemToCell(cell, currenItem);
-                            HotbarUpdateUI();
-                            if (!AddItem(newItem))
-                                DropItem(currentNewItem);
+                            if (_inventoryData[cell].ToFood()?.Amount + currentNewItem.Amount > MAX_FOOD_STACK)
+                            {
+                                Food currenItem = _inventoryData[cell].ToFood();
+                                currentNewItem.Amount = currentNewItem.Amount - (MAX_FOOD_STACK - currenItem.Amount);
+                                currenItem.Amount += MAX_FOOD_STACK - currenItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                if (!AddItem(newItem))
+                                    DropItem(currentNewItem);
 
-                            return true;
-                        }
-                        else
-                        {
-                            Food currenItem = _inventoryData[cell].ToFood();
-                            currenItem.Amount += currentNewItem.Amount;
-                            SetItemToCell(cell, currenItem);
-                            HotbarUpdateUI();
-                            return true;
+                                return true;
+                            }
+                            else
+                            {
+                                Food currenItem = _inventoryData[cell].ToFood();
+                                currenItem.Amount += currentNewItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                return true;
+                            }
                         }
                     }
                 }
@@ -249,6 +253,7 @@ public class Inventory : MonoBehaviour
         SetItemToCell(cell, null);
         DropItem(item);
     }
+
     private void DropItem(Item item)
     {
         if (item.GetType() == typeof(Items.Resource))
@@ -354,6 +359,54 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public void Split(InventoryCell cell, int amount)
+    {
+        if (_inventoryData[cell]?.GetType() != typeof(Equipment))
+        {
+            if(_inventoryData[cell].GetType() == typeof(Items.Resource))
+            {
+                if (_inventoryData[cell].ToResource().Amount == amount)
+                    RemoveItem(cell);
+                else
+                {
+                    _inventoryData[cell].ToResource().Amount -= amount;
+                    SetItemToCell(cell, _inventoryData[cell]);
+                    Item splitedItem = _inventoryData[cell];
+                    splitedItem.ToResource().Amount = amount;
+                    foreach (InventoryCell invCell in _inventoryData.Keys)
+                    {
+                        if (invCell.IsEmpty)
+                        {
+                            SetItemToCell(invCell, splitedItem);
+                            return;
+                        }
+                    }
+                    DropItem(splitedItem);
+                }
+            } else if (_inventoryData[cell].GetType() == typeof(Food))
+            {
+                if (_inventoryData[cell].ToFood().Amount == amount)
+                    RemoveItem(cell);
+                else
+                {
+                    _inventoryData[cell].ToFood().Amount -= amount;
+                    SetItemToCell(cell, _inventoryData[cell]);
+                    Item splitedItem = _inventoryData[cell];
+                    splitedItem.ToFood().Amount = amount;
+                    foreach (InventoryCell invCell in _inventoryData.Keys)
+                    {
+                        if (invCell.IsEmpty)
+                        {
+                            SetItemToCell(invCell, splitedItem);
+                            return;
+                        }
+                    }
+                    DropItem(splitedItem);
+                }
+            }
+        }
+    }
+
     private void SetItemToCell(InventoryCell cell, Item item)
     {
         if (item == null)
@@ -386,6 +439,8 @@ public class Inventory : MonoBehaviour
             cell.SetSprite(item.ItemIcon);
             cell.IsEmpty = false;
         }
-        
     }
+
+    public Item GetItemByCell(InventoryCell cell) =>
+        _inventoryData[cell];
 }

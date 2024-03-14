@@ -151,7 +151,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 431d6db5e7c86214ca4c559a2ecbf6ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  text: {fileID: 0}
   itemIcon: {fileID: 21300000, guid: 5047a0e53735f7345a15072016daa440, type: 3}
   resourceType: 0
   amount: 1
