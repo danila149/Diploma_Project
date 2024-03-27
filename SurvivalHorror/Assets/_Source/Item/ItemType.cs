@@ -1,5 +1,6 @@
 public enum ItemType
 {
     Resource,
-    Equipment
+    Equipment,
+    Food
 }

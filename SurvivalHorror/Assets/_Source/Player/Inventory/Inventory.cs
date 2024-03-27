@@ -6,6 +6,7 @@ using UnityEngine;
 public class Inventory : MonoBehaviour
 {
     public const int MAX_STACK = 99;
+    public const int MAX_FOOD_STACK = 20;
 
     [SerializeField] private Transform gridParent;
     [SerializeField] private GameObject inventoryUI;
@@ -25,6 +26,14 @@ public class Inventory : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            IsInvetoryOpen = false;
+            inventoryUI.SetActive(false);
+            hudUI.SetActive(true);
+            HotbarUpdateUI();
+        }
+
         if (Input.GetKeyDown(KeyCode.Tab) && !craftingSystem.IsCrafting)
         {
             if (inventoryUI.activeInHierarchy)
@@ -59,6 +68,23 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public void UpdateInventory(int cellNum, Item item)
+    {
+        int counter = 0;
+        foreach (InventoryCell cell in _inventoryData.Keys)
+        {
+            if (cell.Hotbar)
+            {
+                if (counter == cellNum)
+                {
+                    SetItemToCell(cell, item);
+                    return;
+                }
+                counter++;
+            }
+        }
+    }
+
     public void HotbarUpdateUI()
     {
         List<Item> items = new List<Item>();
@@ -80,32 +106,69 @@ public class Inventory : MonoBehaviour
 
         foreach (InventoryCell cell in _inventoryData.Keys)
         {
-            if(newItem.GetType() == typeof(Items.Resource) && _inventoryData[cell]?.GetType() != typeof(Equipment))
+            if(_inventoryData[cell]?.GetType() != typeof(Equipment))
             {
-                Items.Resource currentNewItem = newItem.ToResource();
-                if (_inventoryData[cell]?.ToResource().ResourceType == currentNewItem.ResourceType && _inventoryData[cell]?.ToResource().Amount < MAX_STACK)
+                if (newItem.GetType()== typeof(Items.Resource))
                 {
-                    if (_inventoryData[cell].ToResource()?.Amount + currentNewItem.Amount > MAX_STACK)
+                    Items.Resource currentNewItem = newItem.ToResource();
+                    if(_inventoryData[cell]?.GetType() != typeof(Food))
                     {
-                        Items.Resource currenItem = _inventoryData[cell].ToResource();
-                        currentNewItem.Amount = currentNewItem.Amount - (MAX_STACK - currenItem.Amount);
-                        currenItem.Amount += MAX_STACK - currenItem.Amount;
-                        SetItemToCell(cell, currenItem);
-                        HotbarUpdateUI();
-                        if (!AddItem(newItem))
-                            DropItem(currentNewItem);
+                        if (_inventoryData[cell]?.ToResource().ResourceType == currentNewItem.ResourceType && _inventoryData[cell]?.ToResource().Amount < MAX_STACK)
+                        {
+                            if (_inventoryData[cell].ToResource()?.Amount + currentNewItem.Amount > MAX_STACK)
+                            {
+                                Items.Resource currenItem = _inventoryData[cell].ToResource();
+                                currentNewItem.Amount = currentNewItem.Amount - (MAX_STACK - currenItem.Amount);
+                                currenItem.Amount += MAX_STACK - currenItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                if (!AddItem(newItem))
+                                    DropItem(currentNewItem);
 
-                        return true;
-                    }
-                    else
-                    {
-                        Items.Resource currenItem = _inventoryData[cell].ToResource();
-                        currenItem.Amount += currentNewItem.Amount;
-                        SetItemToCell(cell, currenItem);
-                        HotbarUpdateUI();
-                        return true;
+                                return true;
+                            }
+                            else
+                            {
+                                Items.Resource currenItem = _inventoryData[cell].ToResource();
+                                currenItem.Amount += currentNewItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                return true;
+                            }
+                        }
                     }
                 }
+                else if(newItem.GetType()== typeof(Food))
+                {
+                    Food currentNewItem = newItem.ToFood();
+                    if (_inventoryData[cell]?.GetType() != typeof(Items.Resource))
+                    {
+                        if (_inventoryData[cell]?.ToFood().FoodType == currentNewItem.FoodType && _inventoryData[cell]?.ToFood().Amount < MAX_FOOD_STACK)
+                        {
+                            if (_inventoryData[cell].ToFood()?.Amount + currentNewItem.Amount > MAX_FOOD_STACK)
+                            {
+                                Food currenItem = _inventoryData[cell].ToFood();
+                                currentNewItem.Amount = currentNewItem.Amount - (MAX_FOOD_STACK - currenItem.Amount);
+                                currenItem.Amount += MAX_FOOD_STACK - currenItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                if (!AddItem(newItem))
+                                    DropItem(currentNewItem);
+
+                                return true;
+                            }
+                            else
+                            {
+                                Food currenItem = _inventoryData[cell].ToFood();
+                                currenItem.Amount += currentNewItem.Amount;
+                                SetItemToCell(cell, currenItem);
+                                HotbarUpdateUI();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
             } 
             if (cell.IsEmpty)
             {
@@ -146,6 +209,31 @@ public class Inventory : MonoBehaviour
                 }
             }
         }
+
+        if (_inventoryData[origin].GetType() == typeof(Food) && _inventoryData[newCell].GetType() == typeof(Food))
+        {
+            if (_inventoryData[origin].ToFood().FoodType == _inventoryData[newCell]?.ToFood().FoodType)
+            {
+                if (_inventoryData[newCell]?.ToFood().Amount == MAX_FOOD_STACK)
+                    return false;
+
+                if (_inventoryData[origin].ToFood().Amount + _inventoryData[newCell].ToFood().Amount > MAX_FOOD_STACK)
+                {
+                    _inventoryData[origin].ToFood().Amount -= MAX_FOOD_STACK - _inventoryData[newCell].ToFood().Amount;
+                    origin.SetItemCount(_inventoryData[origin].ToFood().Amount.ToString());
+                    _inventoryData[newCell].ToFood().Amount = MAX_FOOD_STACK;
+                    newCell.SetItemCount(MAX_FOOD_STACK.ToString());
+                    return true;
+                }
+                else if (_inventoryData[origin].ToFood().Amount + _inventoryData[newCell].ToFood().Amount <= MAX_FOOD_STACK)
+                {
+                    _inventoryData[newCell].ToFood().Amount += _inventoryData[origin].ToFood().Amount;
+                    newCell.SetItemCount(_inventoryData[newCell].ToFood().Amount.ToString());
+                    SetItemToCell(origin, null);
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -165,15 +253,22 @@ public class Inventory : MonoBehaviour
         SetItemToCell(cell, null);
         DropItem(item);
     }
+
     private void DropItem(Item item)
     {
         if (item.GetType() == typeof(Items.Resource))
         {
             Items.Resource droppedItem = PhotonNetwork.Instantiate(item.ToResource().ResourceType.ToString(), dropPos.position, Quaternion.identity).GetComponent<Items.Resource>();
             droppedItem.Amount = item.ToResource().Amount;
-        } else if(item.GetType() == typeof(Equipment))
+        }
+        else if (item.GetType() == typeof(Food))
+        {
+            Food droppedItem = PhotonNetwork.Instantiate(item.ToFood().FoodType.ToString(), dropPos.position, Quaternion.identity).GetComponent<Food>();
+            droppedItem.Amount = item.ToFood().Amount;
+        }
+        else if (item.GetType() == typeof(Equipment))
             PhotonNetwork.Instantiate(item.ToEquipment().EquipmentType.ToString(), dropPos.position, Quaternion.identity);
-    }
+    }   
 
     public void DropAll()
     {
@@ -264,28 +359,88 @@ public class Inventory : MonoBehaviour
         }
     }
 
+    public void Split(InventoryCell cell, int amount)
+    {
+        if (_inventoryData[cell]?.GetType() != typeof(Equipment))
+        {
+            if(_inventoryData[cell].GetType() == typeof(Items.Resource))
+            {
+                if (_inventoryData[cell].ToResource().Amount == amount)
+                    RemoveItem(cell);
+                else
+                {
+                    _inventoryData[cell].ToResource().Amount -= amount;
+                    SetItemToCell(cell, _inventoryData[cell]);
+                    Item splitedItem = _inventoryData[cell];
+                    splitedItem.ToResource().Amount = amount;
+                    foreach (InventoryCell invCell in _inventoryData.Keys)
+                    {
+                        if (invCell.IsEmpty)
+                        {
+                            SetItemToCell(invCell, splitedItem);
+                            return;
+                        }
+                    }
+                    DropItem(splitedItem);
+                }
+            } else if (_inventoryData[cell].GetType() == typeof(Food))
+            {
+                if (_inventoryData[cell].ToFood().Amount == amount)
+                    RemoveItem(cell);
+                else
+                {
+                    _inventoryData[cell].ToFood().Amount -= amount;
+                    SetItemToCell(cell, _inventoryData[cell]);
+                    Item splitedItem = _inventoryData[cell];
+                    splitedItem.ToFood().Amount = amount;
+                    foreach (InventoryCell invCell in _inventoryData.Keys)
+                    {
+                        if (invCell.IsEmpty)
+                        {
+                            SetItemToCell(invCell, splitedItem);
+                            return;
+                        }
+                    }
+                    DropItem(splitedItem);
+                }
+            }
+        }
+    }
+
     private void SetItemToCell(InventoryCell cell, Item item)
     {
-        if(item == null)
+        if (item == null)
         {
             _inventoryData[cell] = null;
             cell.SetItemCount("");
             cell.SetSprite(null);
             cell.IsEmpty = true;
             return;
-        } else if (item.GetType() == typeof(Items.Resource))
+        }
+        else if (item.GetType() == typeof(Items.Resource))
         {
             _inventoryData[cell] = item;
             Items.Resource currentItem = item.ToResource();
             cell.SetItemCount(currentItem.Amount.ToString());
             cell.SetSprite(currentItem.ItemIcon);
             cell.IsEmpty = false;
-        } else if (item.GetType() == typeof(Equipment))
+        }
+        else if (item.GetType() == typeof(Food))
+        {
+            _inventoryData[cell] = item;
+            Food currentItem = item.ToFood();
+            cell.SetItemCount(currentItem.Amount.ToString());
+            cell.SetSprite(currentItem.ItemIcon);
+            cell.IsEmpty = false;
+        }
+        else if (item.GetType() == typeof(Equipment))
         {
             _inventoryData[cell] = item;
             cell.SetSprite(item.ItemIcon);
             cell.IsEmpty = false;
         }
-        
     }
+
+    public Item GetItemByCell(InventoryCell cell) =>
+        _inventoryData[cell];
 }

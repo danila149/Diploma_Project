@@ -14,6 +14,8 @@ public class HungerSystem : MonoBehaviour
     private float _hunger;
     private bool onStarveCooldown;
 
+    public bool IsFullHunger;
+
     private void Start()
     {
         hungerView.FoodBar.maxValue = maxHunger;
@@ -31,7 +33,12 @@ public class HungerSystem : MonoBehaviour
     {
         _hunger += value;
         if (_hunger >= maxHunger)
+        {
             _hunger = maxHunger;
+            IsFullHunger = true;
+        }
+        else
+            IsFullHunger = false;
 
         if (_hunger >= 80)
             healthSytem.IsHungry = false;

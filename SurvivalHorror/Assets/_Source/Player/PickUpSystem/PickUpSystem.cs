@@ -9,6 +9,9 @@ public class PickUpSystem : MonoBehaviour
     [SerializeField] private float distanceToPickUp;
     [SerializeField] private GameObject itemDestroyer;
     [SerializeField] private Inventory inventory;
+    [SerializeField] private GameObject aim;
+    [SerializeField] private Transform pickupItemInfoParent;
+    [SerializeField] private GameObject pickupItemInfoPrefab;
 
     public bool IsLocal { get; set; }
 
@@ -26,15 +29,14 @@ public class PickUpSystem : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(head.position, head.forward, out hit, distanceToPickUp, itemLayerMask))
             {
+                aim.SetActive(true);
                 _item = hit.transform.gameObject.GetComponent<Item>();
-                _item.ShowText(true);
                 if (Input.GetKeyDown(KeyCode.E))
                     PickUp(_item);
             }
             else
             {
-                if (_item != null)
-                    _item.ShowText(false);
+                aim.SetActive(false);
             }
         }
     }
@@ -45,15 +47,35 @@ public class PickUpSystem : MonoBehaviour
             if (currentItem.ToEquipment().IsEquiped)
                 return;
 
+        if (currentItem.GetType() == typeof(Food))
+            if (currentItem.ToFood().IsEquiped)
+                return;
+
         if (inventory.AddItem(currentItem))
         {
+            PickUpItemInfo pickUpItemInfo;
             GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, currentItem.transform.position);
 
             if (currentItem.GetType() == typeof(Equipment))
             {
-                GetComponent<PhotonView>().RPC("TakeEquipment", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
+                GetComponent<PhotonView>().RPC("TakeIntoHands", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
+
+                pickUpItemInfo = Instantiate(pickupItemInfoPrefab, pickupItemInfoParent).GetComponent<PickUpItemInfo>();
+                pickUpItemInfo.SetInfo(1, currentItem.ItemIcon, currentItem.ToEquipment().EquipmentType.ToString());
+                return;
             }
 
+            if (currentItem.GetType() == typeof(Food))
+            {
+                GetComponent<PhotonView>().RPC("TakeIntoHands", RpcTarget.AllBuffered, currentItem.transform.position, transform.position);
+
+                pickUpItemInfo = Instantiate(pickupItemInfoPrefab, pickupItemInfoParent).GetComponent<PickUpItemInfo>();
+                pickUpItemInfo.SetInfo(currentItem.ToFood().Amount, currentItem.ItemIcon, currentItem.ToFood().FoodType.ToString());
+                return;
+            }
+
+            pickUpItemInfo = Instantiate(pickupItemInfoPrefab, pickupItemInfoParent).GetComponent<PickUpItemInfo>();
+            pickUpItemInfo.SetInfo(currentItem.ToResource().Amount, currentItem.ItemIcon, currentItem.ToResource().ResourceType.ToString());
         }
     }
 
@@ -65,7 +87,7 @@ public class PickUpSystem : MonoBehaviour
     }
 
     [PunRPC]
-    private void TakeEquipment(Vector3 itemPos, Vector3 playerPos)
+    private void TakeIntoHands(Vector3 itemPos, Vector3 playerPos)
     {
         itemDestroyer.GetComponent<ItemDestroyer>().TakeItem(playerPos);
     }
