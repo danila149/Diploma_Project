@@ -23,6 +23,9 @@ TagManager:
   - Cell
   - Workbench
   - Player
+  - Tree
+  - Stone
+  - Enemy
   - 
   - 
   - 
@@ -40,10 +43,7 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - AttackZone
   m_SortingLayers:
   - name: Default
     uniqueID: 0

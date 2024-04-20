@@ -79,6 +79,11 @@ public class PickUpSystem : MonoBehaviour
         }
     }
 
+    public void RemoveItem(Vector3 position)
+    {
+        GetComponent<PhotonView>().RPC("DisableItem", RpcTarget.AllBuffered, position);
+    }
+
     [PunRPC]
     private void DisableItem(Vector3 itemPos)
     {

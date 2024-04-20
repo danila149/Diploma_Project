@@ -248,6 +248,9 @@ MonoBehaviour:
   equipmentType: 0
   durability: 100
   damage: 1
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 8192
 --- !u!54 &5608209546830807100
 Rigidbody:
   m_ObjectHideFlags: 0

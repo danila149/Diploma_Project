@@ -1,7 +1,9 @@
 ﻿using Photon.Pun;
 using System;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class Inventory : MonoBehaviour
 {
@@ -15,6 +17,7 @@ public class Inventory : MonoBehaviour
     [SerializeField] private Hotbar hotbar;
     [SerializeField] private CraftingSystem craftingSystem;
     [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private PickUpSystem pickUpSystem;
 
     public bool IsInvetoryOpen { get; set; }
     private Dictionary<InventoryCell, Item> _inventoryData;
@@ -371,8 +374,9 @@ public class Inventory : MonoBehaviour
                 {
                     _inventoryData[cell].ToResource().Amount -= amount;
                     SetItemToCell(cell, _inventoryData[cell]);
-                    Item splitedItem = _inventoryData[cell];
-                    splitedItem.ToResource().Amount = amount;
+                    Items.Resource splitedItem = PhotonNetwork.Instantiate(_inventoryData[cell].ToResource().ResourceType.ToString(), dropPos.position, Quaternion.identity).GetComponent<Items.Resource>();
+                    splitedItem.Amount = amount;
+                    pickUpSystem.RemoveItem(splitedItem.gameObject.transform.position);
                     foreach (InventoryCell invCell in _inventoryData.Keys)
                     {
                         if (invCell.IsEmpty)
@@ -391,8 +395,9 @@ public class Inventory : MonoBehaviour
                 {
                     _inventoryData[cell].ToFood().Amount -= amount;
                     SetItemToCell(cell, _inventoryData[cell]);
-                    Item splitedItem = _inventoryData[cell];
-                    splitedItem.ToFood().Amount = amount;
+                    Food splitedItem = PhotonNetwork.Instantiate(_inventoryData[cell].ToFood().FoodType.ToString(), dropPos.position, Quaternion.identity).GetComponent<Food>();
+                    splitedItem.Amount = amount;
+                    pickUpSystem.RemoveItem(splitedItem.gameObject.transform.position);
                     foreach (InventoryCell invCell in _inventoryData.Keys)
                     {
                         if (invCell.IsEmpty)

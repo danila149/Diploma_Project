@@ -1,5 +1,7 @@
 public enum EquipmentType
 {
     WoodenSword,
-    StoneSword
+    StoneSword,
+    WoodenPickaxe,
+    WoodenAxe
 }

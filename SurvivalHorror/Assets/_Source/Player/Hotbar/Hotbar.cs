@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,8 @@ public class Hotbar : MonoBehaviour
     [SerializeField] private HungerSystem hungerSystem;
     [SerializeField] private Inventory inventory;
     [SerializeField] private CraftingSystem craftingSystem;
+    [SerializeField] private AttackZone triggerZone;
+    [SerializeField] private PickUpSystem pickUpSystem;
 
     private Dictionary<InventoryCell, Item> _hotbarData;
     private List<HotbarCellData> _hotbarCells;
@@ -25,24 +28,11 @@ public class Hotbar : MonoBehaviour
         ChooseCell();
         if (_hotbarData[_currentActiveCell]?.GetType() == typeof(Food))
         {
-            if (Input.GetMouseButtonDown(0) && !inventory.IsInvetoryOpen && !craftingSystem.IsCrafting)
-            {
-                if (!hungerSystem.IsFullHunger)
-                {
-                    hungerSystem.ChangeValue(_hotbarData[_currentActiveCell].ToFood().Saturation);
-                    _hotbarData[_currentActiveCell].ToFood().Amount--;
-                    if (_hotbarData[_currentActiveCell].ToFood().Amount != 0)
-                        _currentActiveCell.SetItemCount(_hotbarData[_currentActiveCell].ToFood().Amount.ToString());
-                    else
-                    {
-                        _currentActiveCell.SetItemCount("");
-                        _currentActiveCell.SetSprite(null);
-                        _hotbarData[_currentActiveCell] = null;
-                    }
-
-                    UpdateInventory();
-                }
-            }
+            UseFood();
+        }
+        if (_hotbarData[_currentActiveCell]?.GetType() == typeof(Equipment))
+        {
+            UseEquipment();
         }
     }
 
@@ -64,6 +54,51 @@ public class Hotbar : MonoBehaviour
                 _hotbarCells[0].CellOutline.enabled = true;
             }
         }
+    }
+
+    private void UseFood()
+    {
+        if (Input.GetMouseButtonDown(0) && !inventory.IsInvetoryOpen && !craftingSystem.IsCrafting)
+        {
+            if (!hungerSystem.IsFullHunger)
+            {
+                hungerSystem.ChangeValue(_hotbarData[_currentActiveCell].ToFood().Saturation);
+                _hotbarData[_currentActiveCell].ToFood().Amount--;
+                if (_hotbarData[_currentActiveCell].ToFood().Amount != 0)
+                    _currentActiveCell.SetItemCount(_hotbarData[_currentActiveCell].ToFood().Amount.ToString());
+                else
+                {
+                    _currentActiveCell.SetItemCount("");
+                    _currentActiveCell.SetSprite(null);
+                    _hotbarData[_currentActiveCell] = null;
+                }
+
+                UpdateInventory();
+            }
+        }
+    }
+
+    public void GetResource(Item resource)
+    {
+        pickUpSystem.PickUp(resource);
+    }
+
+    private void UseEquipment()
+    {
+        if (Input.GetMouseButtonDown(0) && !inventory.IsInvetoryOpen && !craftingSystem.IsCrafting)
+        {
+            triggerZone.gameObject.SetActive(true);
+            triggerZone.SetDamage(_hotbarData[_currentActiveCell].ToEquipment().Damage);
+            triggerZone.SetLayerMask(_hotbarData[_currentActiveCell].ToEquipment().LayerMask);
+            triggerZone.SetHotbar(this);
+            StartCoroutine(WaitAHalfSecond());
+        }
+    }
+
+    private IEnumerator WaitAHalfSecond()
+    {
+        yield return new WaitForSeconds(0.5f);
+        triggerZone.gameObject.SetActive(false);
     }
 
     public void UpdateInventory()

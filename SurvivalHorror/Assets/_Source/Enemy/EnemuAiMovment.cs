@@ -38,7 +38,7 @@ public class EnemuAiMovment : MonoBehaviour
         {
             loudness = detection.GetLoudnessFromMicrophone() * loundsSensebility;
             Dist_player = Vector3.Distance(Player.transform.position, gameObject.transform.position);
-            Debug.Log(loudness);
+            //Debug.Log(loudness);
             if (loudness >= max)
             {
                 chek = true;
