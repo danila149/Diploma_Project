@@ -20,9 +20,15 @@ public class RoomList : MonoBehaviourPunCallbacks
     [SerializeField] private TMP_InputField passwordInput;
     [SerializeField] private Button passwordConfirm;
     [SerializeField] private GameObject error;
+    [Header("Filter")]
+    [SerializeField] private Toggle passwordToggle;
+    [SerializeField] private Toggle fullServerToggle;
+    [SerializeField] private Button filtreByNameBtn;
+    [SerializeField] private Button filtreByPlayerCountBtn;
 
     private string _currentPassword;
     private List<RoomInfo> _cachedRoomList = new List<RoomInfo>();
+    private Dictionary<RoomInfo, GameObject> shownList = new Dictionary<RoomInfo, GameObject>();
 
     IEnumerator Start()
     {
@@ -42,6 +48,10 @@ public class RoomList : MonoBehaviourPunCallbacks
         passwordConfirm.onClick.AddListener(JoinRoomWithPassword);
         Instance = this;
         createRoomBtn.onClick.AddListener(delegate { ChangeRoomToCreateName(inputLobbyName.text); });
+        filtreByNameBtn.onClick.AddListener(GroupByName);
+        filtreByPlayerCountBtn.onClick.AddListener(GroupByPlayerCount);
+        passwordToggle.onValueChanged.AddListener(FilterByPassword);
+        fullServerToggle.onValueChanged.AddListener(FilterByPlayerCount);
     }
 
     public override void OnConnectedToMaster()
@@ -85,11 +95,83 @@ public class RoomList : MonoBehaviourPunCallbacks
         UpdateUI();
     }
 
+    public void GroupByName()
+    {
+        _cachedRoomList.Sort(delegate (RoomInfo x, RoomInfo y)
+        {
+            if (x.Name == null && y.Name == null) return 0;
+            else if (x.Name == null) return -1;
+            else if (y.Name == null) return 1;
+            else return x.Name.CompareTo(y.Name);
+        });
+        UpdateUI();
+    }
+
+    public void GroupByPlayerCount()
+    {
+        _cachedRoomList.Sort(delegate (RoomInfo x, RoomInfo y)
+        {
+            return x.PlayerCount.CompareTo(y.PlayerCount);
+        });
+        UpdateUI();
+    }
+
+    private void FilterByPassword(bool value)
+    {
+        List<RoomInfo> extraList = new List<RoomInfo>(_cachedRoomList);
+        if (value)
+        {
+            foreach (var room in extraList)
+            {
+                if ((bool)room.CustomProperties["private"])
+                {
+                    shownList[room].SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            foreach (var room in extraList)
+            {
+                if ((bool)room.CustomProperties["private"])
+                {
+                    shownList[room].SetActive(true);
+                }
+            }
+        }
+    }
+
+    private void FilterByPlayerCount(bool value)
+    {
+        List<RoomInfo> extraList = new List<RoomInfo>(_cachedRoomList);
+        if (!value)
+        {
+            foreach (var room in extraList)
+            {
+                if (room.MaxPlayers == room.PlayerCount)
+                {
+                    shownList[room].SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            foreach (var room in extraList)
+            {
+                if (room.MaxPlayers == room.PlayerCount)
+                {
+                    shownList[room].SetActive(true);
+                }
+            }
+        }
+    }
+
     private void UpdateUI()
     {
         foreach (Transform roomItem in roomListParent)
         {
             Destroy(roomItem.gameObject);
+            shownList.Clear();
         }
 
         foreach (var room in _cachedRoomList)
@@ -105,6 +187,9 @@ public class RoomList : MonoBehaviourPunCallbacks
                 }
             }
             _roomitem.GetComponent<RoomitemButton>().RoomName = room.Name;
+            shownList.Add(room, _roomitem);
+            FilterByPassword(passwordToggle.isOn);
+            FilterByPlayerCount(fullServerToggle.isOn);
         }
     }
 
